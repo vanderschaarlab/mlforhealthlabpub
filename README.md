@@ -33,6 +33,9 @@ See also [doc/install.md](doc/install.md) for common installation instructions.
 ## Tutorials and or examples
 *See individual algorithm and app directories for tutorials and examples.*
 
+## Data
+Data files (as well as other large files such as saved models etc.) can be downloaded as per instructions in the `DATA-*.md` (see e.g. [DATA-PUBLIC.md](./DATA-PUBLIC.md)) files found in the corresponding directories.
+
 ## More info
 For more information on the van der Schaar Lab’s work, visit [our homepage](https://www.vanderschaar-lab.com/).
 

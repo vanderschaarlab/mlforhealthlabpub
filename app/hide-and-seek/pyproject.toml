@@ -1,0 +1,19 @@
+[tool.black]
+line-length = 120
+target-version = ['py36']
+exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  # Custom:
+  | tests\/data\/test_data_preprocess\.py
+)
+'''

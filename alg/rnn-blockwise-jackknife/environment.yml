@@ -1,0 +1,14 @@
+name: py36_rbj
+channels:
+  - pytorch
+  - defaults
+dependencies:
+  - cudatoolkit=9.2
+  - matplotlib=3.3.2
+  - notebook=6.1.6
+  - numpy=1.19.2
+  - pip=20.3.3
+  - python=3.6.12
+  - pytorch=1.4.0
+  - scikit-learn=0.23.2
+  - scipy=1.5.2

@@ -1,0 +1,93 @@
+# Useful link: https://www.howtoforge.com/tutorial/unison-file-sync-between-two-servers-on-debian-10/
+#
+# NOTE: If syncing with more than one other VM, use multiple .prf files and set up multiple corn jobs.
+# e.g hns1.prf and hns3.prf with cron using say 0-59/10 and 5-59/10 in the minute field. 
+# That is, in this template, replace <VM-ID>, <DELAY>.
+# NOTE: Unison must operate through the root user (hence start by $ sudo su).
+# 
+# 1. Update roots.
+# 2. Update logfile path.
+# 4. Save this file under /root/.unison/ as hns<VM-ID>.prf
+# 5. set cron task:
+#    $ crontab -e
+#    <add a line like:> 
+#    <DELAY>-59/10 * * * * unison hns<VM-ID> &> /home/<LOGS_USER>/unison.hns<VM-ID>.out
+
+# Roots of the synchronization
+root = /opt/hide-and-seek
+root = ssh://VM-<VM-ID>-URL//opt/hide-and-seek
+
+# Log file
+logfile=/home/<LOGS_USER>/unison.hns<VM-ID>.log
+
+#          When set to true, this flag causes the user interface to skip
+#          asking for confirmations on non-conflicting changes. (More
+#          precisely, when the user interface is done setting the
+#          propagation direction for one entry and is about to move to the
+#          next, it will skip over all non-conflicting entries and go
+#          directly to the next conflict.)
+auto=true
+
+#          When this is set to true, the user interface will ask no
+#          questions at all. Non-conflicting changes will be propagated;
+#          conflicts will be skipped.
+batch=true
+
+#          !When this is set to true, Unison will request an extra
+#          confirmation if it appears that the entire replica has been
+#          deleted, before propagating the change. If the batch flag is
+#          also set, synchronization will be aborted. When the path
+#          preference is used, the same confirmation will be requested for
+#          top-level paths. (At the moment, this flag only affects the
+#          text user interface.) See also the mountpoint preference.
+confirmbigdel=true
+
+#          When this preference is set to true, Unison will use the
+#          modification time and length of a file as a `pseudo inode
+#          number' when scanning replicas for updates, instead of reading
+#          the full contents of every file. Under Windows, this may cause
+#          Unison to miss propagating an update if the modification time
+#          and length of the file are both unchanged by the update.
+#          However, Unison will never overwrite such an update with a
+#          change from the other replica, since it always does a safe
+#          check for updates just before propagating a change. Thus, it is
+#          reasonable to use this switch under Windows most of the time
+#          and occasionally run Unison once with fastcheck set to false,
+#          if you are worried that Unison may have overlooked an update.
+#          The default value of the preference is auto, which causes
+#          Unison to use fast checking on Unix replicas (where it is safe)
+#          and slow checking on Windows replicas. For backward
+#          compatibility, yes, no, and default can be used in place of
+#          true, false, and auto. See the section "Fast Checking" for more
+#          information.
+fastcheck=true
+
+#          When this flag is set to true, the group attributes of the
+#          files are synchronized. Whether the group names or the group
+#          identifiers are synchronizeddepends on the preference numerids.
+group=true
+
+#          When this flag is set to true, the owner attributes of the
+#          files are synchronized. Whether the owner names or the owner
+#          identifiers are synchronizeddepends on the preference
+#          extttnumerids.
+owner=true
+
+#          Including the preference -prefer root causes Unison always to
+#          resolve conflicts in favor of root, rather than asking for
+#          guidance from the user. (The syntax of root is the same as for
+#          the root preference, plus the special values newer and older.)
+#          This preference is overridden by the preferpartial preference.
+#          This preference should be used only if you are sure you know
+#          what you are doing!
+prefer=newer
+
+#          When this preference is set to true, the textual user interface
+#          will print nothing at all, except in the case of errors.
+#          Setting silent to true automatically sets the batch preference
+#          to true.
+silent=true
+
+#          When this flag is set to true, file modification times (but not
+#          directory modtimes) are propagated.
+times=true

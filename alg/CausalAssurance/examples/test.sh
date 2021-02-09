@@ -1,0 +1,1 @@
+python3 causal_assurance.py --modeldir models/ --i abalone.csv --target_var Rings --input_vars Sex --input_vars Height --input_vars Diameter --input_vars Length --discrete Sex --l 1.0 --e Sex Height --e Sex Diameter --e Sex Length --o output

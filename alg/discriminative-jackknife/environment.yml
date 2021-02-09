@@ -1,0 +1,18 @@
+name: py36_dj
+channels:
+  - pytorch
+  - defaults
+dependencies:
+  - cudatoolkit=10.1.243
+  - matplotlib=3.3.2
+  - notebook=6.1.5
+  - numpy=1.19.2
+  - pandas=1.1.5
+  - pip=20.3.3
+  - python=3.6.12
+  - pytorch=1.4.0
+  - scikit-learn=0.23.2
+  - scipy=1.5.2
+  - pip:
+    - tensorflow-gpu==1.15.0
+    - theano==1.0.5

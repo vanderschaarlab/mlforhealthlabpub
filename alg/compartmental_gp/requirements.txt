@@ -1,0 +1,6 @@
+pyro
+pytorch
+numpy
+pandas
+scipy
+matplotlib

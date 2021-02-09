@@ -1,0 +1,4 @@
+celery==3.1.25
+requests==1.2.3
+PyYAML==3.10
+psutil==2.1.1

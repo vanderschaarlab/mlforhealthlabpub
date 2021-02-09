@@ -1,0 +1,6 @@
+**/*.zip
+WKG/
+starting_kit/output
+starting_kit/data/*
+!starting_kit/data/NOTE.md
+deployment/testscript.py

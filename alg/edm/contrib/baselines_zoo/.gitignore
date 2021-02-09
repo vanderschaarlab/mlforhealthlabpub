@@ -1,0 +1,10 @@
+__pycache__/
+logs/
+.pytest_cache/
+.coverage
+.coverage.*
+.idea/
+cluster_sbatch.sh
+cluster_sbatch_mpi.sh
+.git/
+.pytype/

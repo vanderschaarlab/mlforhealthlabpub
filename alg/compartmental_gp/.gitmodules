@@ -1,0 +1,6 @@
+[submodule "ox-policy-tracker"]
+	path = ox-policy-tracker
+	url = https://github.com/OxCGRT/covid-policy-tracker.git
+[submodule "ts-data"]
+	path = ts-data
+	url = https://github.com/CSSEGISandData/COVID-19.git

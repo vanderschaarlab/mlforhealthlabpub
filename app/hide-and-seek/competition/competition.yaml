@@ -1,0 +1,77 @@
+title: "NeurIPS 2020 Hide-and-Seek Privacy Challenge"
+description: "Synthetic Data Generation vs. Patient Re-identification with Clinical Time-series Data"
+image: logo.jpg
+
+competition_docker_image: drshushen/hide-and-seek-codalab:latest
+
+start_date: 2020-06-15
+end_date: 2020-11-30
+
+has_registration: true
+force_submission_to_leaderboard: true
+disallow_leaderboard_modifying: true
+enable_detailed_results: false
+
+admin_names: JamesJ,NickMaxfield,tavianator,ESSaveliev,uncle
+
+html:
+  overview: overview.html
+  evaluation: evaluation.html
+  terms: terms.html
+  data: data.html
+
+phases:
+  0:
+    phasenumber: 1
+    color: green
+    label: "Development"
+    description: "Generation- and inference-track submissions."
+    start_date: 2020-06-15
+    execution_time_limit: 0
+    max_submissions: 100
+    max_submissions_per_day: 99
+    is_scoring_only: false
+    scoring_program: scoring_program.zip
+    input_data: public_data.zip
+    public_data: public_data.zip
+    reference_data: reference_data.zip
+    starting_kit: starting_kit.zip
+    auto_migration: false
+
+  1:
+    phasenumber: 2
+    color: purple
+    label: "Evaluation"
+    description: "Final phase."
+    start_date: 2020-11-15
+    execution_time_limit: 0
+    max_submissions: 100
+    max_submissions_per_day: 100
+    is_scoring_only: true
+    scoring_program: scoring_program.zip
+    input_data: public_data.zip
+    public_data: public_data.zip
+    reference_data: reference_data.zip
+    starting_kit: starting_kit.zip
+    auto_migration: false
+
+leaderboard:
+  leaderboards:
+    Hiders: &HIDERS
+      label: Hiders
+      rank: 1
+    Seekers: &SEEKERS
+      label: Seekers
+      rank: 2
+
+  columns:
+    hider_score:
+      leaderboard: *HIDERS
+      label: Hider score
+      rank: 1
+      sort: asc
+    seeker_score:
+      leaderboard: *SEEKERS
+      label: Seeker score
+      rank: 1
+      sort: desc

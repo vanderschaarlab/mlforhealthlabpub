@@ -1,0 +1,10 @@
+numpy==1.16.0
+scipy==1.2.3
+scikit_survival==0.5
+xgboost==0.90
+pandas==0.21.1
+matplotlib==2.2.2
+seaborn==0.9.0
+matplotlib==3.2.1
+pandas==1.0.3
+scikit_learn==0.22.2.post1

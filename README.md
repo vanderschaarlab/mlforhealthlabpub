@@ -32,6 +32,7 @@ GANITE: Estimation of Individualized Treatment Effects using Generative Adversar
 DeepHit: A Deep Learning Approach to Survival Analysis with Competing Risks [[Link]](https://aaai.org/ocs/index.php/AAAI/AAAI18/paper/view/16160/15945) | AAAI 2018 | [alg/deephit](alg/deephit)
 DAGs with NO TEARS: Continuous Optimization for Structure Learning [[Link]](https://arxiv.org/abs/1803.01422) | NeurIPS 2018 | [alg/castle](alg/castle)
 INVASE: Instance-wise Variable Selection using Neural Networks [[Link]](https://openreview.net/forum?id=BJg_roAcK7) | ICLR 2019 | [alg/invase](alg/invase)
+PATE-GAN: Generating Synthetic Data with Differential Privacy Guarantees [[Link]](https://openreview.net/forum?id=S1zk9iRqF7) | ICLR 2019 | [alg/pategan](alg/pategan)
 KnockoffGAN: Generating Knockoffs for Feature Selection using Generative Adversarial Networks [[Link]](https://openreview.net/forum?id=ByeZ5jC5YQ) | ICLR 2019 | [alg/knockoffgan](alg/knockoffgan)
 ASAC: Active Sensing using Actor-Critic Models [[Link]](https://arxiv.org/abs/1906.06796) | MLHC 2019 | [alg/asac](alg/asac)
 Demystifying Black-box Models with Symbolic Metamodels [[Link]](https://papers.nips.cc/paper/2019/hash/567b8f5f423af15818a068235807edc0-Abstract.html) | NeurIPS 2019 | [alg/symbolic_metamodeling](alg/symbolic_metamodeling)
@@ -60,6 +61,8 @@ Robust Recursive Partitioning for Heterogeneous Treatment Effects with Uncertain
 Estimating the Effects of Continuous-valued Interventions using Generative Adversarial Networks [[Link]](https://arxiv.org/abs/2002.12326) | NeurIPS 2020 | [alg/scigan](alg/scigan)
 Learning outside the Black-Box: The pursuit of interpretable models [[Link]](https://arxiv.org/abs/2011.08596) | NeurIPS 2020 | [alg/Symbolic-Pursuit](alg/Symbolic-Pursuit)
 VIME: Extending the Success of Self- and Semi-supervised Learning to Tabular Domain [[Link]](https://papers.nips.cc/paper/2020/hash/7d97667a3e056acab9aaf653807b4a03-Abstract.html) | NeurIPS 2020 | [alg/vime](alg/vime)
+Scalable Bayesian Inverse Reinforcement Learning [[Link]](https://openreview.net/pdf?id=4qR3coiNaIv) | ICLR 2021 | [alg/scalable-birl](alg/scalable-birl)
+Nonparametric Estimation of Heterogeneous Treatment Effects: From Theory to Learning Algorithms[[Link]](https://arxiv.org/abs/2101.10943)| AISTATS 2021|[alg/CATENets](alg/CATENets)
 <br/>
 
 * Details of apps and other software is listed below:

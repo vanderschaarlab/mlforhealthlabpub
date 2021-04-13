@@ -1,0 +1,6 @@
+numpy>=1.18.2
+argparse>=1.1
+pandas>=1.0.3
+tensorflow==1.15.0
+scikit-learn>=0.21.3
+xgboost>=0.90

@@ -169,7 +169,7 @@ def adsgan(orig_data, params):
   # Loss function
   D_loss = tf.reduce_mean(D_fake) - tf.reduce_mean(D_real) + grad_pen
     
-  G_loss1 = -tf.sqrt(tf.reduce_mean(tf.square(X - G_sample)))
+  G_loss1 = -tf.reduce_mean(tf.sqrt(tf.reduce_sum(input_tensor=tf.square(X - G_sample), axis=1)))
   G_loss2 = -tf.reduce_mean(D_fake)
     
   G_loss = G_loss2 + lamda * G_loss1

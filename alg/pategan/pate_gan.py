@@ -1,4 +1,12 @@
-'''PATE-GAN function'''
+"""PATE-GAN: Generating Synthetic Data with Differential Privacy Guarantees Codebase.
+
+Reference: James Jordon, Jinsung Yoon, Mihaela van der Schaar, 
+"PATE-GAN: Generating Synthetic Data with Differential Privacy Guarantees," 
+International Conference on Learning Representations (ICLR), 2019.
+Paper link: https://openreview.net/forum?id=S1zk9iRqF7
+Last updated Date: Feburuary 15th 2020
+Code author: Jinsung Yoon (jsyoon0823@gmail.com)
+"""
 
 # Necessary packages
 import tensorflow as tf
@@ -40,7 +48,7 @@ def pate_lamda (x, teacher_models, lamda):
   return n0, n1, out 
 
 
-def pate_gan(x_train, parameters):
+def pategan(x_train, parameters):
   '''Basic PATE-GAN framework.
   
   Args:
@@ -109,7 +117,7 @@ def pate_gan(x_train, parameters):
         
   # Sample from uniform distribution
   def sample_Z(m, n):
-    return np.random.uniform(0., 1., size = [m, n])
+    return np.random.uniform(-1., 1., size = [m, n])
      
   ## Placeholder
   # PATE labels
@@ -229,7 +237,6 @@ def pate_gan(x_train, parameters):
     # Generator Update        
     Z_mb = sample_Z(batch_size, z_dim)
     _, G_loss_curr = sess.run([G_solver, G_loss], feed_dict = {Z: Z_mb})
-    print(np.mean(Y_mb))
         
     # epsilon_hat computation
     curr_list = list()        
@@ -237,27 +244,9 @@ def pate_gan(x_train, parameters):
       temp_alpha = (alpha[l] + np.log(1/delta)) / float(l+1)
       curr_list = curr_list + [temp_alpha]
         
-    epsilon_hat = np.min(curr_list)
-    print(epsilon_hat)        
+    epsilon_hat = np.min(curr_list)    
 
   ## Outputs
   x_train_hat = sess.run([G_sample], feed_dict = {Z: sample_Z(no, z_dim)})[0]
     
   return x_train_hat
-
-
-## Main
-if __name__ == '__main__':
-  
-  x_train = np.random.normal(0, 1, [10000,5])
-    
-  # Normalization
-  for i in range(len(x_train[0, :])):
-    x_train[:, i] = x_train[:, i] - np.min(x_train[:, i])
-    x_train[:, i] = x_train[:, i] / (np.max(x_train[:, i]) + 1e-8)
-  
-  
-  parameters = {'n_s': 1, 'batch_size': 1000, 
-                'k': 100, 'epsilon': 100, 'delta': 0.0001, 'lamda': 1}
-
-  x_train_new = pate_gan(x_train, parameters)

@@ -18,15 +18,15 @@ An overview of the content of this repository is as below:
 ```
 
 ## Publications
-* The publications and the corresponding locations in the repo are listed below:
+The publications and the corresponding locations in the repo are listed below:
 
 Paper [[Link]](#) | Journal/Conference | Code
 --- | --- | ---
 Bayesian Inference of Individualized Treatment Effects using Multi-task Gaussian Processes [[Link]](https://proceedings.neurips.cc/paper/2017/hash/6a508a60aa3bf9510ea6acb021c94b48-Abstract.html) | NIPS 2017 | [alg/causal_multitask_gaussian_processes_ite](alg/causal_multitask_gaussian_processes_ite)
 Deep Multi-task Gaussian Processes for Survival Analysis with Competing Risks [[Link]](https://proceedings.neurips.cc/paper/2017/hash/861dc9bd7f4e7dd3cccd534d0ae2a2e9-Abstract.html) | NIPS 2017 | [alg/dgp_survival](alg/dgp_survival)
-AutoPrognosis: Automated Clinical Prognostic Modeling via Bayesian Optimization with Structured Kernel Learning [[Link]](https://icml.cc/Conferences/2018/Schedule?showEvent=2050) | ICML 2018 | [alg/autoprognosis/](alg/autoprognosis/)
+AutoPrognosis: Automated Clinical Prognostic Modeling via Bayesian Optimization with Structured Kernel Learning [[Link]](https://icml.cc/Conferences/2018/Schedule?showEvent=2050) | ICML 2018 | [alg/autoprognosis](alg/autoprognosis)
 Limits of Estimating Heterogeneous Treatment Effects: Guidelines for Practical Algorithm Design [[Link]](http://proceedings.mlr.press/v80/alaa18a.html) | ICML 2018 | [alg/causal_multitask_gaussian_processes_ite](alg/causal_multitask_gaussian_processes_ite)
-GAIN: Missing Data Imputation using Generative Adversarial Nets [[Link]](http://proceedings.mlr.press/v80/yoon18a.html) | ICML 2018 | [alg/gain/](alg/gain/)
+GAIN: Missing Data Imputation using Generative Adversarial Nets [[Link]](http://proceedings.mlr.press/v80/yoon18a.html) | ICML 2018 | [alg/gain](alg/gain)
 RadialGAN: Leveraging multiple datasets to improve target-specific predictive models using Generative Adversarial Networks [[Link]](http://proceedings.mlr.press/v80/yoon18b.html) | ICML 2018 | [alg/RadialGAN](alg/RadialGAN)
 GANITE: Estimation of Individualized Treatment Effects using Generative Adversarial Nets [[Link]](https://openreview.net/forum?id=ByKWUeWA-) | ICLR 2018 | [alg/ganite](alg/ganite)
 Deep Sensing: Active Sensing using Multi-directional Recurrent Neural Networks [[Link]](https://openreview.net/forum?id=r1SnX5xCb) | ICLR 2018 | [alg/DeepSensing (MRNN)](alg/DeepSensing%20(MRNN))
@@ -66,7 +66,7 @@ Scalable Bayesian Inverse Reinforcement Learning [[Link]](https://openreview.net
 Nonparametric Estimation of Heterogeneous Treatment Effects: From Theory to Learning Algorithms [[Link]](https://arxiv.org/abs/2101.10943) | AISTATS 2021 | [alg/CATENets](alg/CATENets)
 <br/>
 
-* Details of apps and other software is listed below:
+Details of apps and other software is listed below:
 
 App/Software [[Link]](#) | Description | Publication | Code
 --- | --- | --- | --- 

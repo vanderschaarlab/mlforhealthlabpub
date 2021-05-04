@@ -40,6 +40,7 @@ Differentially Private Bagging: Improved Utility and Cheaper Privacy than Subsam
 Time-series Generative Adversarial Networks [[Link]](https://papers.nips.cc/paper/2019/hash/c9efe5f26cd17ba6216bbe2a7d26d490-Abstract.html) | NeurIPS 2019 | [alg/timegan](alg/timegan)
 Attentive State-Space Modeling of Disease Progression [[Link]](https://papers.nips.cc/paper/2019/hash/1d0932d7f57ce74d9d9931a2c6db8a06-Abstract.html) | NeurIPS 2019 | [alg/attentivess](alg/attentivess)
 Conditional Independence Testing using Generative Adversarial Networks [[Link]](https://arxiv.org/abs/1907.04068) | NeurIPS 2019 | [alg/gcit](alg/gcit)
+Dynamic-DeepHit: A Deep Learning Approach for Dynamic Survival Analysis with Competing Risks based on Longitudinal Data [[Link]](https://ieeexplore.ieee.org/document/8681104) | IEEE | [alg/dynamic_deephit](alg/dynamic_deephit)
 Temporal Quilting for Survival Analysis [[Link]](http://proceedings.mlr.press/v89/lee19a.html) | AISTATS 2019 | [alg/survivalquilts](alg/survivalquilts)
 Estimating Counterfactual Treatment Outcomes over Time through Adversarially Balanced Representations [[Link]](https://openreview.net/forum?id=BJg866NFvB) | ICLR 2020 | [alg/counterfactual_recurrent_network](alg/counterfactual_recurrent_network)
 Contextual Constrained Learning for Dose-Finding Clinical Trials [[Link]](https://arxiv.org/abs/2001.02463) | AISTATS 2020 | [alg/c3t_budgets](alg/c3t_budgets)

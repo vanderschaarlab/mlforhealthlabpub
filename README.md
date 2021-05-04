@@ -29,6 +29,7 @@ Limits of Estimating Heterogeneous Treatment Effects: Guidelines for Practical A
 GAIN: Missing Data Imputation using Generative Adversarial Nets [[Link]](http://proceedings.mlr.press/v80/yoon18a.html) | ICML 2018 | [alg/gain/](alg/gain/)
 RadialGAN: Leveraging multiple datasets to improve target-specific predictive models using Generative Adversarial Networks [[Link]](http://proceedings.mlr.press/v80/yoon18b.html) | ICML 2018 | [alg/RadialGAN](alg/RadialGAN)
 GANITE: Estimation of Individualized Treatment Effects using Generative Adversarial Nets [[Link]](https://openreview.net/forum?id=ByKWUeWA-) | ICLR 2018 | [alg/ganite](alg/ganite)
+Deep Sensing: Active Sensing using Multi-directional Recurrent Neural Networks [[Link]](https://openreview.net/forum?id=r1SnX5xCb) | ICLR 2018 | [alg/DeepSensing (MRNN)](alg/DeepSensing%20(MRNN))
 DeepHit: A Deep Learning Approach to Survival Analysis with Competing Risks [[Link]](https://aaai.org/ocs/index.php/AAAI/AAAI18/paper/view/16160/15945) | AAAI 2018 | [alg/deephit](alg/deephit)
 INVASE: Instance-wise Variable Selection using Neural Networks [[Link]](https://openreview.net/forum?id=BJg_roAcK7) | ICLR 2019 | [alg/invase](alg/invase)
 PATE-GAN: Generating Synthetic Data with Differential Privacy Guarantees [[Link]](https://openreview.net/forum?id=S1zk9iRqF7) | ICLR 2019 | [alg/pategan](alg/pategan)
@@ -61,7 +62,7 @@ Estimating the Effects of Continuous-valued Interventions using Generative Adver
 Learning outside the Black-Box: The pursuit of interpretable models [[Link]](https://arxiv.org/abs/2011.08596) | NeurIPS 2020 | [alg/Symbolic-Pursuit](alg/Symbolic-Pursuit)
 VIME: Extending the Success of Self- and Semi-supervised Learning to Tabular Domain [[Link]](https://papers.nips.cc/paper/2020/hash/7d97667a3e056acab9aaf653807b4a03-Abstract.html) | NeurIPS 2020 | [alg/vime](alg/vime)
 Scalable Bayesian Inverse Reinforcement Learning [[Link]](https://openreview.net/pdf?id=4qR3coiNaIv) | ICLR 2021 | [alg/scalable-birl](alg/scalable-birl)
-Nonparametric Estimation of Heterogeneous Treatment Effects: From Theory to Learning Algorithms[[Link]](https://arxiv.org/abs/2101.10943)| AISTATS 2021|[alg/CATENets](alg/CATENets)
+Nonparametric Estimation of Heterogeneous Treatment Effects: From Theory to Learning Algorithms [[Link]](https://arxiv.org/abs/2101.10943) | AISTATS 2021 | [alg/CATENets](alg/CATENets)
 <br/>
 
 * Details of apps and other software is listed below:

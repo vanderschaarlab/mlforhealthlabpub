@@ -64,6 +64,7 @@ Learning outside the Black-Box: The pursuit of interpretable models [[Link]](htt
 VIME: Extending the Success of Self- and Semi-supervised Learning to Tabular Domain [[Link]](https://papers.nips.cc/paper/2020/hash/7d97667a3e056acab9aaf653807b4a03-Abstract.html) | NeurIPS 2020 | [alg/vime](alg/vime)
 Scalable Bayesian Inverse Reinforcement Learning [[Link]](https://openreview.net/pdf?id=4qR3coiNaIv) | ICLR 2021 | [alg/scalable-birl](alg/scalable-birl)
 Nonparametric Estimation of Heterogeneous Treatment Effects: From Theory to Learning Algorithms [[Link]](https://arxiv.org/abs/2101.10943) | AISTATS 2021 | [alg/CATENets](alg/CATENets)
+Learning Matching Representations for Individualized Organ Transplantation Allocation [[Link]](https://arxiv.org/abs/2101.11769) | AISTATS 2021| [alg/MatchingRep](alg/MatchingRep)
 <br/>
 
 Details of apps and other software is listed below:

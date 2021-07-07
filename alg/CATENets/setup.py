@@ -14,7 +14,8 @@ setuptools.setup(
     description="Conditional Average Treatment Effect Estimation Using Neural Networks",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/AliciaCurth/CATENets",
+    url="https://github.com/vanderschaarlab/mlforhealthlabpub/tree/main/alg/CATENets",
+    license="BSD-3-Clause",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

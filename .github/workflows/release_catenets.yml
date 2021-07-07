@@ -30,7 +30,7 @@ jobs:
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: ../../.github/workflows/scripts/release_osx.sh
+        run: ${GITHUB_WORKSPACE}/.github/workflows/scripts/release_osx.sh
 
   deploy_linux:
     strategy:
@@ -54,7 +54,7 @@ jobs:
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-        run: ../../.github/workflows/scripts/release_linux.sh
+        run: ${GITHUB_WORKSPACE}/.github/workflows/scripts/release_linux.sh
 
   deploy_windows:
     runs-on: windows-latest
@@ -73,4 +73,4 @@ jobs:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
-          ../../.github/workflows/scripts/release_windows.bat
+          ${GITHUB_WORKSPACE}/.github/workflows/scripts/release_windows.bat

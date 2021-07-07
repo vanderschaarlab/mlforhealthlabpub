@@ -8,5 +8,4 @@ python3 -m pip install setuptools wheel twine auditwheel
 
 # Publish
 python3 -m pip wheel . -w dist/ --no-deps
-auditwheel repair dist/*.whl --plat $AUDITWHEEL_PLAT
 twine upload --verbose --skip-existing dist/*

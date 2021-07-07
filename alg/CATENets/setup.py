@@ -19,6 +19,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
+        "Topic :: Machine learning :: Healthcare",
     ],
     install_requires=install_requires,
 )

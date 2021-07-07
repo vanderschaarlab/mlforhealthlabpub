@@ -8,7 +8,7 @@ with open("requirements.txt") as fp:
 
 setuptools.setup(
     name="catenets",
-    version="0.1.1",
+    version="0.1.2",
     author="Alicia Curth",
     author_email="amc253@cam.ac.uk",
     description="Conditional Average Treatment Effect Estimation Using Neural Networks",

@@ -8,4 +8,4 @@ python3 -m pip install setuptools wheel twine auditwheel
 
 # Publish
 python3 -m pip wheel . -w dist/ --no-deps
-twine upload --skip-existing wheelhouse/*
+twine upload --skip-existing dist/*

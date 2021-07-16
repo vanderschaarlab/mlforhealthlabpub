@@ -1,6 +1,6 @@
 -r ./requirements.txt
-bandit
 
+bandit
 black
 flake8
 pre-commit

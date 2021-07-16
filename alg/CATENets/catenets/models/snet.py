@@ -3,19 +3,45 @@ Author: Alicia Curth
 Module implements SNet class as discussed in Curth & van der Schaar (2021)
 """
 
-from jax import jit, grad, random
+from typing import Any, Callable, List, Tuple
+
 import jax.numpy as jnp
+import numpy as onp
+from jax import grad, jit, random
 from jax.experimental import optimizers
 
-import numpy as onp
-
-from catenets.models.base import OutputHead, ReprBlock, BaseCATENet
-from catenets.models.model_utils import check_shape_1d_data, make_val_split, heads_l2_penalty
-from catenets.models.constants import *
+from catenets.models.base import BaseCATENet, OutputHead, ReprBlock
+from catenets.models.constants import (
+    DEFAULT_AVG_OBJECTIVE,
+    DEFAULT_BATCH_SIZE,
+    DEFAULT_LAYERS_OUT,
+    DEFAULT_LAYERS_R,
+    DEFAULT_N_ITER,
+    DEFAULT_N_ITER_MIN,
+    DEFAULT_N_ITER_PRINT,
+    DEFAULT_NONLIN,
+    DEFAULT_PATIENCE,
+    DEFAULT_PENALTY_DISC,
+    DEFAULT_PENALTY_L2,
+    DEFAULT_PENALTY_ORTHOGONAL,
+    DEFAULT_SEED,
+    DEFAULT_STEP_SIZE,
+    DEFAULT_UNITS_OUT,
+    DEFAULT_VAL_SPLIT,
+    LARGE_VAL,
+)
+from catenets.models.disentangled_nets import (
+    DEFAULT_UNITS_R_BIG_S3,
+    DEFAULT_UNITS_R_SMALL_S3,
+    _concatenate_representations,
+    _get_absolute_rowsums,
+)
+from catenets.models.model_utils import (
+    check_shape_1d_data,
+    heads_l2_penalty,
+    make_val_split,
+)
 from catenets.models.representation_nets import mmd2_lin
-from catenets.models.disentangled_nets import DEFAULT_UNITS_R_BIG_S3, DEFAULT_UNITS_R_SMALL_S3, \
-                                                _get_absolute_rowsums, _concatenate_representations
-
 
 DEFAULT_UNITS_R_BIG_S = 100
 DEFAULT_UNITS_R_SMALL_S = 50
@@ -81,21 +107,34 @@ class SNet(BaseCATENet):
     penalty_disc: float, default zero
         Discrepancy penalty. Defaults to zero as this feature is not tested.
     """
-    def __init__(self, with_prop: bool = True, binary_y: bool = False,
-                 n_layers_r: int = DEFAULT_LAYERS_R,
-                 n_units_r: int = DEFAULT_UNITS_R_BIG_S, n_layers_out: int = DEFAULT_LAYERS_OUT,
-                 n_units_r_small: int = DEFAULT_UNITS_R_SMALL_S,
-                 n_units_out: int = DEFAULT_UNITS_OUT, penalty_l2: float = DEFAULT_PENALTY_L2,
-                 penalty_orthogonal: float = DEFAULT_PENALTY_ORTHOGONAL,
-                 penalty_disc: float = DEFAULT_PENALTY_DISC,
-                 step_size: float = DEFAULT_STEP_SIZE,
-                 n_iter: int = DEFAULT_N_ITER, batch_size: int = DEFAULT_BATCH_SIZE,
-                 val_split_prop: float = DEFAULT_VAL_SPLIT, early_stopping: bool = True,
-                 patience: int = DEFAULT_PATIENCE, n_iter_min: int = DEFAULT_N_ITER_MIN,
-                 verbose: int = 1, n_iter_print: int = DEFAULT_N_ITER_PRINT,
-                 reg_diff: bool = False, penalty_diff: float = DEFAULT_PENALTY_L2,
-                 seed: int = DEFAULT_SEED, nonlin: str = DEFAULT_NONLIN, same_init: bool = False
-                 ):
+
+    def __init__(
+        self,
+        with_prop: bool = True,
+        binary_y: bool = False,
+        n_layers_r: int = DEFAULT_LAYERS_R,
+        n_units_r: int = DEFAULT_UNITS_R_BIG_S,
+        n_layers_out: int = DEFAULT_LAYERS_OUT,
+        n_units_r_small: int = DEFAULT_UNITS_R_SMALL_S,
+        n_units_out: int = DEFAULT_UNITS_OUT,
+        penalty_l2: float = DEFAULT_PENALTY_L2,
+        penalty_orthogonal: float = DEFAULT_PENALTY_ORTHOGONAL,
+        penalty_disc: float = DEFAULT_PENALTY_DISC,
+        step_size: float = DEFAULT_STEP_SIZE,
+        n_iter: int = DEFAULT_N_ITER,
+        batch_size: int = DEFAULT_BATCH_SIZE,
+        val_split_prop: float = DEFAULT_VAL_SPLIT,
+        early_stopping: bool = True,
+        patience: int = DEFAULT_PATIENCE,
+        n_iter_min: int = DEFAULT_N_ITER_MIN,
+        verbose: int = 1,
+        n_iter_print: int = DEFAULT_N_ITER_PRINT,
+        reg_diff: bool = False,
+        penalty_diff: float = DEFAULT_PENALTY_L2,
+        seed: int = DEFAULT_SEED,
+        nonlin: str = DEFAULT_NONLIN,
+        same_init: bool = False,
+    ) -> None:
         self.with_prop = with_prop
         self.binary_y = binary_y
 
@@ -125,39 +164,53 @@ class SNet(BaseCATENet):
         self.verbose = verbose
         self.n_iter_print = n_iter_print
 
-    def _get_predict_function(self):
+    def _get_predict_function(self) -> Callable:
         if self.with_prop:
             return predict_snet
         else:
             return predict_snet_noprop
 
-    def _get_train_function(self):
+    def _get_train_function(self) -> Callable:
         if self.with_prop:
             return train_snet
         else:
             return train_snet_noprop
 
 
-def train_snet(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT_LAYERS_R,
-               n_units_r: int = DEFAULT_UNITS_R_BIG_S,
-               n_units_r_small: int = DEFAULT_UNITS_R_SMALL_S,
-               n_layers_out: int = DEFAULT_LAYERS_OUT,
-               n_units_out: int = DEFAULT_UNITS_OUT,
-               penalty_l2: float = DEFAULT_PENALTY_L2, penalty_disc: float = DEFAULT_PENALTY_DISC,
-               penalty_orthogonal: float = DEFAULT_PENALTY_ORTHOGONAL,
-               step_size: float = DEFAULT_STEP_SIZE,
-               n_iter: int = DEFAULT_N_ITER, batch_size: int = DEFAULT_BATCH_SIZE,
-               val_split_prop: float = DEFAULT_VAL_SPLIT,
-               early_stopping: bool = True,
-               patience: int = DEFAULT_PATIENCE, n_iter_min: int = DEFAULT_N_ITER_MIN,
-               verbose: int = 1, n_iter_print: int = DEFAULT_N_ITER_PRINT,
-               seed: int = DEFAULT_SEED, return_val_loss: bool = False,
-               reg_diff: bool = False, penalty_diff: float = DEFAULT_PENALTY_L2,
-               nonlin: str = DEFAULT_NONLIN, avg_objective: bool = DEFAULT_AVG_OBJECTIVE,
-               with_prop: bool = True, same_init: bool = False):
+def train_snet(
+    X: jnp.ndarray,
+    y: jnp.ndarray,
+    w: jnp.ndarray,
+    binary_y: bool = False,
+    n_layers_r: int = DEFAULT_LAYERS_R,
+    n_units_r: int = DEFAULT_UNITS_R_BIG_S,
+    n_units_r_small: int = DEFAULT_UNITS_R_SMALL_S,
+    n_layers_out: int = DEFAULT_LAYERS_OUT,
+    n_units_out: int = DEFAULT_UNITS_OUT,
+    penalty_l2: float = DEFAULT_PENALTY_L2,
+    penalty_disc: float = DEFAULT_PENALTY_DISC,
+    penalty_orthogonal: float = DEFAULT_PENALTY_ORTHOGONAL,
+    step_size: float = DEFAULT_STEP_SIZE,
+    n_iter: int = DEFAULT_N_ITER,
+    batch_size: int = DEFAULT_BATCH_SIZE,
+    val_split_prop: float = DEFAULT_VAL_SPLIT,
+    early_stopping: bool = True,
+    patience: int = DEFAULT_PATIENCE,
+    n_iter_min: int = DEFAULT_N_ITER_MIN,
+    verbose: int = 1,
+    n_iter_print: int = DEFAULT_N_ITER_PRINT,
+    seed: int = DEFAULT_SEED,
+    return_val_loss: bool = False,
+    reg_diff: bool = False,
+    penalty_diff: float = DEFAULT_PENALTY_L2,
+    nonlin: str = DEFAULT_NONLIN,
+    avg_objective: bool = DEFAULT_AVG_OBJECTIVE,
+    with_prop: bool = True,
+    same_init: bool = False,
+) -> Any:
     # function to train a net with 5 representations
     if not with_prop:
-        raise ValueError('train_snet works only withprop=True')
+        raise ValueError("train_snet works only withprop=True")
     y, w = check_shape_1d_data(y), check_shape_1d_data(w)
     d = X.shape[1]
     input_shape = (-1, d)
@@ -168,28 +221,32 @@ def train_snet(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT_LAYERS
         penalty_diff = penalty_l2
 
     # get validation split (can be none)
-    X, y, w, X_val, y_val, w_val, val_string = make_val_split(X, y, w,
-                                                              val_split_prop=val_split_prop,
-                                                              seed=seed)
+    X, y, w, X_val, y_val, w_val, val_string = make_val_split(
+        X, y, w, val_split_prop=val_split_prop, seed=seed
+    )
     n = X.shape[0]  # could be different from before due to split
 
     # get representation layers
-    init_fun_repr, predict_fun_repr = ReprBlock(n_layers=n_layers_r, n_units=n_units_r,
-                                                nonlin=nonlin)
-    init_fun_repr_small, predict_fun_repr_small = ReprBlock(n_layers=n_layers_r,
-                                                            n_units=n_units_r_small,
-                                                            nonlin=nonlin)
+    init_fun_repr, predict_fun_repr = ReprBlock(
+        n_layers=n_layers_r, n_units=n_units_r, nonlin=nonlin
+    )
+    init_fun_repr_small, predict_fun_repr_small = ReprBlock(
+        n_layers=n_layers_r, n_units=n_units_r_small, nonlin=nonlin
+    )
 
     # get output head functions (output heads share same structure)
-    init_fun_head_po, predict_fun_head_po = OutputHead(n_layers_out=n_layers_out,
-                                                       n_units_out=n_units_out,
-                                                       binary_y=binary_y, nonlin=nonlin)
+    init_fun_head_po, predict_fun_head_po = OutputHead(
+        n_layers_out=n_layers_out,
+        n_units_out=n_units_out,
+        binary_y=binary_y,
+        nonlin=nonlin,
+    )
     # add propensity head
-    init_fun_head_prop, predict_fun_head_prop = OutputHead(n_layers_out=n_layers_out,
-                                                           n_units_out=n_units_out,
-                                                           binary_y=True, nonlin=nonlin)
+    init_fun_head_prop, predict_fun_head_prop = OutputHead(
+        n_layers_out=n_layers_out, n_units_out=n_units_out, binary_y=True, nonlin=nonlin
+    )
 
-    def init_fun_snet(rng, input_shape):
+    def init_fun_snet(rng: float, input_shape: Tuple) -> Tuple[Tuple, List]:
         # chain together the layers
         # param should look like [param_repr_c, param_repr_o, param_repr_mu0, param_repr_mu1,
         #                              param_repr_w, param_0, param_1, param_prop]
@@ -197,7 +254,9 @@ def train_snet(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT_LAYERS
         rng, layer_rng = random.split(rng)
         input_shape_repr, param_repr_c = init_fun_repr(layer_rng, input_shape)
         rng, layer_rng = random.split(rng)
-        input_shape_repr_small, param_repr_o = init_fun_repr_small(layer_rng, input_shape)
+        input_shape_repr_small, param_repr_o = init_fun_repr_small(
+            layer_rng, input_shape
+        )
         rng, layer_rng = random.split(rng)
         _, param_repr_mu0 = init_fun_repr_small(layer_rng, input_shape)
         rng, layer_rng = random.split(rng)
@@ -207,8 +266,9 @@ def train_snet(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT_LAYERS
 
         # prop and mu_0 each get two representations, mu_1 gets 3
         input_shape_repr_prop = input_shape_repr[:-1] + (2 * input_shape_repr[-1],)
-        input_shape_repr_mu = input_shape_repr[:-1] + (input_shape_repr[-1] +
-                                                       (2 * input_shape_repr_small[-1]),)
+        input_shape_repr_mu = input_shape_repr[:-1] + (
+            input_shape_repr[-1] + (2 * input_shape_repr_small[-1]),
+        )
 
         # initialise output heads
         rng, layer_rng = random.split(rng)
@@ -223,37 +283,53 @@ def train_snet(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT_LAYERS
 
         rng, layer_rng = random.split(rng)
         input_shape, param_prop = init_fun_head_prop(layer_rng, input_shape_repr_prop)
-        return input_shape, [param_repr_c, param_repr_o, param_repr_mu0, param_repr_mu1,
-                             param_repr_w, param_0, param_1, param_prop]
+        return input_shape, [
+            param_repr_c,
+            param_repr_o,
+            param_repr_mu0,
+            param_repr_mu1,
+            param_repr_w,
+            param_0,
+            param_1,
+            param_prop,
+        ]
 
     # Define loss functions
     # loss functions for the head
     if not binary_y:
-        def loss_head(params, batch, penalty):
+
+        def loss_head(params: dict, batch: jnp.ndarray, penalty: float) -> jnp.ndarray:
             # mse loss function
             inputs, targets, weights = batch
             preds = predict_fun_head_po(params, inputs)
             return jnp.sum(weights * ((preds - targets) ** 2))
+
     else:
-        def loss_head(params, batch, penalty):
+
+        def loss_head(params: dict, batch: jnp.ndarray, penalty: float) -> jnp.ndarray:
             # log loss function
             inputs, targets, weights = batch
             preds = predict_fun_head_po(params, inputs)
-            return - jnp.sum(weights * (targets * jnp.log(preds) +
-                                        (1 - targets) * jnp.log(
-                        1 - preds)))
+            return -jnp.sum(
+                weights
+                * (targets * jnp.log(preds) + (1 - targets) * jnp.log(1 - preds))
+            )
 
-    def loss_head_prop(params, batch, penalty):
+    def loss_head_prop(params: dict, batch: jnp.ndarray, penalty: float) -> jnp.ndarray:
         # log loss function for propensities
         inputs, targets = batch
         preds = predict_fun_head_prop(params, inputs)
-        return - jnp.sum(targets * jnp.log(preds) +
-                         (1 - targets) * jnp.log(
-            1 - preds))
+        return -jnp.sum(targets * jnp.log(preds) + (1 - targets) * jnp.log(1 - preds))
 
     # complete loss function for all parts
     @jit
-    def loss_snet(params, batch, penalty_l2, penalty_orthogonal, penalty_disc):
+    def loss_snet(
+        params: dict,
+        batch: jnp.ndarray,
+        penalty_l2: float,
+        penalty_orthogonal: float,
+        penalty_disc: float,
+    ) -> jnp.ndarray:
         # params: # param should look like [param_repr_c, param_repr_o, param_repr_mu0,
         #              param_repr_mu1, param_repr_w, param_0, param_1, param_prop]
         # batch: (X, y, w)
@@ -288,37 +364,76 @@ def train_snet(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT_LAYERS
         col_mu1 = _get_absolute_rowsums(params[3][0][0])
         col_w = _get_absolute_rowsums(params[4][0][0])
         loss_o = penalty_orthogonal * (
-            jnp.sum(col_c * col_o + col_c * col_w + col_c * col_mu1 + col_c * col_mu0 + col_w *
-                    col_o + col_mu0 * col_o + col_o * col_mu1 + col_mu0 * col_mu1 + col_mu0 * col_w +
-                    col_w * col_mu1))
+            jnp.sum(
+                col_c * col_o
+                + col_c * col_w
+                + col_c * col_mu1
+                + col_c * col_mu0
+                + col_w * col_o
+                + col_mu0 * col_o
+                + col_o * col_mu1
+                + col_mu0 * col_mu1
+                + col_mu0 * col_w
+                + col_w * col_mu1
+            )
+        )
 
         # weight decay on representations
-        weightsq_body = sum([sum([jnp.sum(params[j][i][0] ** 2) for i in
-                             range(0, 2 * n_layers_r, 2)]) for j in range(5)])
-        weightsq_head = heads_l2_penalty(params[5], params[6], n_layers_out, reg_diff,
-                                         penalty_l2, penalty_diff)
-        weightsq_prop = sum([jnp.sum(params[7][i][0] ** 2) for i in
-                             range(0, 2 * n_layers_out + 1, 2)])
+        weightsq_body = sum(
+            [
+                sum(
+                    [jnp.sum(params[j][i][0] ** 2) for i in range(0, 2 * n_layers_r, 2)]
+                )
+                for j in range(5)
+            ]
+        )
+        weightsq_head = heads_l2_penalty(
+            params[5], params[6], n_layers_out, reg_diff, penalty_l2, penalty_diff
+        )
+        weightsq_prop = sum(
+            [jnp.sum(params[7][i][0] ** 2) for i in range(0, 2 * n_layers_out + 1, 2)]
+        )
 
         if not avg_objective:
-            return loss_0 + loss_1 + loss_prop + loss_disc + loss_o + 0.5 * (penalty_l2 * (
-            weightsq_body + weightsq_prop) + weightsq_head)
+            return (
+                loss_0
+                + loss_1
+                + loss_prop
+                + loss_disc
+                + loss_o
+                + 0.5 * (penalty_l2 * (weightsq_body + weightsq_prop) + weightsq_head)
+            )
         else:
             n_batch = y.shape[0]
-            return (loss_0 + loss_1)/n_batch + loss_prop/n_batch + loss_disc + loss_o\
-                   + 0.5 * (penalty_l2 * (weightsq_body + weightsq_prop) + weightsq_head)
-
+            return (
+                (loss_0 + loss_1) / n_batch
+                + loss_prop / n_batch
+                + loss_disc
+                + loss_o
+                + 0.5 * (penalty_l2 * (weightsq_body + weightsq_prop) + weightsq_head)
+            )
 
     # Define optimisation routine
     opt_init, opt_update, get_params = optimizers.adam(step_size=step_size)
 
     @jit
-    def update(i, state, batch, penalty_l2, penalty_orthogonal, penalty_disc):
+    def update(
+        i: int,
+        state: dict,
+        batch: jnp.ndarray,
+        penalty_l2: float,
+        penalty_orthogonal: float,
+        penalty_disc: float,
+    ) -> jnp.ndarray:
         # updating function
         params = get_params(state)
-        return opt_update(i, grad(loss_snet)(
-            params, batch, penalty_l2, penalty_orthogonal, penalty_disc),
-                          state)
+        return opt_update(
+            i,
+            grad(loss_snet)(
+                params, batch, penalty_l2, penalty_orthogonal, penalty_disc
+            ),
+            state,
+        )
 
     # initialise states
     _, init_params = init_fun_snet(rng_key, input_shape)
@@ -337,20 +452,31 @@ def train_snet(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT_LAYERS
         # shuffle data for minibatches
         onp.random.shuffle(train_indices)
         for b in range(n_batches):
-            idx_next = train_indices[(b * batch_size):min((b + 1) * batch_size, n - 1)]
+            idx_next = train_indices[
+                (b * batch_size) : min((b + 1) * batch_size, n - 1)
+            ]
             next_batch = X[idx_next, :], y[idx_next, :], w[idx_next]
-            opt_state = update(i * n_batches + b, opt_state, next_batch, penalty_l2,
-                               penalty_orthogonal,
-                               penalty_disc)
+            opt_state = update(
+                i * n_batches + b,
+                opt_state,
+                next_batch,
+                penalty_l2,
+                penalty_orthogonal,
+                penalty_disc,
+            )
 
         if (verbose > 0 and i % n_iter_print == 0) or early_stopping:
             params_curr = get_params(opt_state)
-            l_curr = loss_snet(params_curr, (X_val, y_val, w_val),
-                                penalty_l2, penalty_orthogonal, penalty_disc)
+            l_curr = loss_snet(
+                params_curr,
+                (X_val, y_val, w_val),
+                penalty_l2,
+                penalty_orthogonal,
+                penalty_disc,
+            )
 
         if verbose > 0 and i % n_iter_print == 0:
-            print("Epoch: {}, current {} loss {}".format(i,
-                                                         val_string, l_curr))
+            print(f"Epoch: {i}, current {val_string} loss {l_curr}")
 
         if early_stopping and ((i + 1) * n_batches > n_iter_min):
             # check if loss updated
@@ -361,20 +487,28 @@ def train_snet(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT_LAYERS
             else:
                 if onp.isnan(l_curr):
                     # if diverged, return best
-                    return params_best, (predict_fun_repr, predict_fun_head_po,
-                                         predict_fun_head_prop)
+                    return params_best, (
+                        predict_fun_repr,
+                        predict_fun_head_po,
+                        predict_fun_head_prop,
+                    )
                 p_curr = p_curr + 1
 
             if p_curr > patience:
                 if return_val_loss:
                     # return loss without penalty
-                    l_final = loss_snet(params_curr, (X_val, y_val, w_val), 0,
-                                         0, 0)
-                    return params_curr, (predict_fun_repr, predict_fun_head_po,
-                                         predict_fun_head_prop), l_final
+                    l_final = loss_snet(params_curr, (X_val, y_val, w_val), 0, 0, 0)
+                    return (
+                        params_curr,
+                        (predict_fun_repr, predict_fun_head_po, predict_fun_head_prop),
+                        l_final,
+                    )
 
-                return params_curr, (predict_fun_repr, predict_fun_head_po,
-                                     predict_fun_head_prop)
+                return params_curr, (
+                    predict_fun_repr,
+                    predict_fun_head_po,
+                    predict_fun_head_prop,
+                )
 
     # return the parameters
     trained_params = get_params(opt_state)
@@ -382,17 +516,33 @@ def train_snet(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT_LAYERS
     if return_val_loss:
         # return loss without penalty
         l_final = loss_snet(get_params(opt_state), (X_val, y_val, w_val), 0, 0)
-        return trained_params, (predict_fun_repr, predict_fun_head_po, predict_fun_head_prop), \
-               l_final
+        return (
+            trained_params,
+            (predict_fun_repr, predict_fun_head_po, predict_fun_head_prop),
+            l_final,
+        )
 
-    return trained_params, (predict_fun_repr, predict_fun_head_po, predict_fun_head_prop)
+    return trained_params, (
+        predict_fun_repr,
+        predict_fun_head_po,
+        predict_fun_head_prop,
+    )
 
 
-def predict_snet(X, trained_params, predict_funs, return_po: bool = False,
-                 return_prop: bool = False):
+def predict_snet(
+    X: jnp.ndarray,
+    trained_params: dict,
+    predict_funs: list,
+    return_po: bool = False,
+    return_prop: bool = False,
+) -> jnp.ndarray:
     # unpack inputs
     predict_fun_repr, predict_fun_head, predict_fun_prop = predict_funs
-    param_0, param_1, param_prop = trained_params[5], trained_params[6], trained_params[7]
+    param_0, param_1, param_prop = (
+        trained_params[5],
+        trained_params[6],
+        trained_params[7],
+    )
 
     reps_c = predict_fun_repr(trained_params[0], X)
     reps_o = predict_fun_repr(trained_params[1], X)
@@ -428,28 +578,41 @@ def predict_snet(X, trained_params, predict_funs, return_po: bool = False,
 
 
 # SNet without propensity head  ----------------------------------------
-def train_snet_noprop(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT_LAYERS_R,
-                      n_units_r: int = DEFAULT_UNITS_R_BIG_S3,
-                      n_units_r_small: int = DEFAULT_UNITS_R_SMALL_S3,
-                      n_layers_out: int = DEFAULT_LAYERS_OUT,
-                      n_units_out: int = DEFAULT_UNITS_OUT,
-                      penalty_l2: float = DEFAULT_PENALTY_L2,
-                      penalty_orthogonal: float = DEFAULT_PENALTY_ORTHOGONAL,
-                      step_size: float = DEFAULT_STEP_SIZE,
-                      n_iter: int = DEFAULT_N_ITER, batch_size: int = DEFAULT_BATCH_SIZE,
-                      val_split_prop: float = DEFAULT_VAL_SPLIT,
-                      early_stopping: bool = True, n_iter_min: int = DEFAULT_N_ITER_MIN,
-                      patience: int = DEFAULT_PATIENCE,
-                      verbose: int = 1, n_iter_print: int = DEFAULT_N_ITER_PRINT,
-                      seed: int = DEFAULT_SEED, return_val_loss: bool = False,
-                      reg_diff: bool = False, penalty_diff: float = DEFAULT_PENALTY_L2,
-                      nonlin: str = DEFAULT_NONLIN, avg_objective: bool = DEFAULT_AVG_OBJECTIVE,
-                      with_prop: bool = False, same_init: bool = False):
+def train_snet_noprop(
+    X: jnp.ndarray,
+    y: jnp.ndarray,
+    w: jnp.ndarray,
+    binary_y: bool = False,
+    n_layers_r: int = DEFAULT_LAYERS_R,
+    n_units_r: int = DEFAULT_UNITS_R_BIG_S3,
+    n_units_r_small: int = DEFAULT_UNITS_R_SMALL_S3,
+    n_layers_out: int = DEFAULT_LAYERS_OUT,
+    n_units_out: int = DEFAULT_UNITS_OUT,
+    penalty_l2: float = DEFAULT_PENALTY_L2,
+    penalty_orthogonal: float = DEFAULT_PENALTY_ORTHOGONAL,
+    step_size: float = DEFAULT_STEP_SIZE,
+    n_iter: int = DEFAULT_N_ITER,
+    batch_size: int = DEFAULT_BATCH_SIZE,
+    val_split_prop: float = DEFAULT_VAL_SPLIT,
+    early_stopping: bool = True,
+    n_iter_min: int = DEFAULT_N_ITER_MIN,
+    patience: int = DEFAULT_PATIENCE,
+    verbose: int = 1,
+    n_iter_print: int = DEFAULT_N_ITER_PRINT,
+    seed: int = DEFAULT_SEED,
+    return_val_loss: bool = False,
+    reg_diff: bool = False,
+    penalty_diff: float = DEFAULT_PENALTY_L2,
+    nonlin: str = DEFAULT_NONLIN,
+    avg_objective: bool = DEFAULT_AVG_OBJECTIVE,
+    with_prop: bool = False,
+    same_init: bool = False,
+) -> Any:
     """
     SNet but without the propensity head
     """
     if with_prop:
-        raise ValueError('train_snet_noprop works only withprop=False')
+        raise ValueError("train_snet_noprop works only withprop=False")
     # function to train a net with 3 representations
     y, w = check_shape_1d_data(y), check_shape_1d_data(w)
     d = X.shape[1]
@@ -461,36 +624,44 @@ def train_snet_noprop(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT
         penalty_diff = penalty_l2
 
     # get validation split (can be none)
-    X, y, w, X_val, y_val, w_val, val_string = make_val_split(X, y, w,
-                                                              val_split_prop=val_split_prop,
-                                                              seed=seed)
+    X, y, w, X_val, y_val, w_val, val_string = make_val_split(
+        X, y, w, val_split_prop=val_split_prop, seed=seed
+    )
     n = X.shape[0]  # could be different from before due to split
 
     # get representation layers
-    init_fun_repr, predict_fun_repr = ReprBlock(n_layers=n_layers_r, n_units=n_units_r,
-                                                nonlin=nonlin)
-    init_fun_repr_small, predict_fun_repr_small = ReprBlock(n_layers=n_layers_r,
-                                                            n_units=n_units_r_small, nonlin=nonlin)
+    init_fun_repr, predict_fun_repr = ReprBlock(
+        n_layers=n_layers_r, n_units=n_units_r, nonlin=nonlin
+    )
+    init_fun_repr_small, predict_fun_repr_small = ReprBlock(
+        n_layers=n_layers_r, n_units=n_units_r_small, nonlin=nonlin
+    )
 
     # get output head functions (output heads share same structure)
-    init_fun_head_po, predict_fun_head_po = OutputHead(n_layers_out=n_layers_out,
-                                                       n_units_out=n_units_out,
-                                                       binary_y=binary_y, nonlin=nonlin)
+    init_fun_head_po, predict_fun_head_po = OutputHead(
+        n_layers_out=n_layers_out,
+        n_units_out=n_units_out,
+        binary_y=binary_y,
+        nonlin=nonlin,
+    )
 
-    def init_fun_snet_noprop(rng, input_shape):
+    def init_fun_snet_noprop(rng: float, input_shape: Tuple) -> Tuple[Tuple, List]:
         # chain together the layers
         # param should look like [repr_o, repr_p0, repr_p1, po_0, po_1]
         # initialise representation layers
         rng, layer_rng = random.split(rng)
         input_shape_repr, param_repr_o = init_fun_repr(layer_rng, input_shape)
         rng, layer_rng = random.split(rng)
-        input_shape_repr_small, param_repr_p0 = init_fun_repr_small(layer_rng, input_shape)
+        input_shape_repr_small, param_repr_p0 = init_fun_repr_small(
+            layer_rng, input_shape
+        )
         rng, layer_rng = random.split(rng)
         _, param_repr_p1 = init_fun_repr_small(layer_rng, input_shape)
 
         # each head gets two representations
-        input_shape_repr = input_shape_repr[:-1] + (input_shape_repr[-1] + input_shape_repr_small[
-            -1],)
+        input_shape_repr = input_shape_repr[:-1] + (
+            input_shape_repr[-1] + input_shape_repr_small[-1],
+        )
 
         # initialise output heads
         rng, layer_rng = random.split(rng)
@@ -503,28 +674,40 @@ def train_snet_noprop(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT
             rng, layer_rng = random.split(rng)
             input_shape, param_1 = init_fun_head_po(layer_rng, input_shape_repr)
 
-        return input_shape, [param_repr_o, param_repr_p0, param_repr_p1, param_0, param_1]
+        return input_shape, [
+            param_repr_o,
+            param_repr_p0,
+            param_repr_p1,
+            param_0,
+            param_1,
+        ]
 
     # Define loss functions
     # loss functions for the head
     if not binary_y:
-        def loss_head(params, batch, penalty):
+
+        def loss_head(params: dict, batch: jnp.ndarray, penalty: float) -> jnp.ndarray:
             # mse loss function
             inputs, targets, weights = batch
             preds = predict_fun_head_po(params, inputs)
             return jnp.sum(weights * ((preds - targets) ** 2))
+
     else:
-        def loss_head(params, batch, penalty):
+
+        def loss_head(params: dict, batch: jnp.ndarray, penalty: float) -> jnp.ndarray:
             # log loss function
             inputs, targets, weights = batch
             preds = predict_fun_head_po(params, inputs)
-            return - jnp.sum(weights * (targets * jnp.log(preds) +
-                                        (1 - targets) * jnp.log(
-                        1 - preds)))
+            return -jnp.sum(
+                weights
+                * (targets * jnp.log(preds) + (1 - targets) * jnp.log(1 - preds))
+            )
 
     # complete loss function for all parts
     @jit
-    def loss_snet_noprop(params, batch, penalty_l2, penalty_orthogonal):
+    def loss_snet_noprop(
+        params: dict, batch: jnp.ndarray, penalty_l2: float, penalty_orthogonal: float
+    ) -> jnp.ndarray:
         # params: list[repr_o, repr_p0, repr_p1, po_0, po_1]
         # batch: (X, y, w)
         X, y, w = batch
@@ -547,31 +730,54 @@ def train_snet_noprop(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT
         col_p0 = _get_absolute_rowsums(params[1][0][0])
         col_p1 = _get_absolute_rowsums(params[2][0][0])
         loss_o = penalty_orthogonal * (
-            jnp.sum(col_o * col_p0 + col_o * col_p1 + col_p1 * col_p0))
+            jnp.sum(col_o * col_p0 + col_o * col_p1 + col_p1 * col_p0)
+        )
 
         # weight decay on representations
-        weightsq_body = sum([sum([jnp.sum(params[j][i][0] ** 2) for i in
-                             range(0, 2 * n_layers_r, 2)]) for j in range(3)])
-        weightsq_head = heads_l2_penalty(params[3], params[4], n_layers_out, reg_diff,
-                                         penalty_l2, penalty_diff)
+        weightsq_body = sum(
+            [
+                sum(
+                    [jnp.sum(params[j][i][0] ** 2) for i in range(0, 2 * n_layers_r, 2)]
+                )
+                for j in range(3)
+            ]
+        )
+        weightsq_head = heads_l2_penalty(
+            params[3], params[4], n_layers_out, reg_diff, penalty_l2, penalty_diff
+        )
         if not avg_objective:
-            return loss_0 + loss_1 + loss_o + 0.5 * (penalty_l2 * weightsq_body + weightsq_head)
+            return (
+                loss_0
+                + loss_1
+                + loss_o
+                + 0.5 * (penalty_l2 * weightsq_body + weightsq_head)
+            )
         else:
             n_batch = y.shape[0]
-            return (loss_0 + loss_1)/n_batch + loss_o + \
-                   0.5 * (penalty_l2 * weightsq_body + weightsq_head)
-
+            return (
+                (loss_0 + loss_1) / n_batch
+                + loss_o
+                + 0.5 * (penalty_l2 * weightsq_body + weightsq_head)
+            )
 
     # Define optimisation routine
     opt_init, opt_update, get_params = optimizers.adam(step_size=step_size)
 
     @jit
-    def update(i, state, batch, penalty_l2, penalty_orthogonal):
+    def update(
+        i: int,
+        state: dict,
+        batch: jnp.ndarray,
+        penalty_l2: float,
+        penalty_orthogonal: float,
+    ) -> jnp.ndarray:
         # updating function
         params = get_params(state)
-        return opt_update(i, grad(loss_snet_noprop)(
-            params, batch, penalty_l2, penalty_orthogonal),
-                          state)
+        return opt_update(
+            i,
+            grad(loss_snet_noprop)(params, batch, penalty_l2, penalty_orthogonal),
+            state,
+        )
 
     # initialise states
     _, init_params = init_fun_snet_noprop(rng_key, input_shape)
@@ -590,19 +796,22 @@ def train_snet_noprop(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT
         # shuffle data for minibatches
         onp.random.shuffle(train_indices)
         for b in range(n_batches):
-            idx_next = train_indices[(b * batch_size):min((b + 1) * batch_size, n - 1)]
+            idx_next = train_indices[
+                (b * batch_size) : min((b + 1) * batch_size, n - 1)
+            ]
             next_batch = X[idx_next, :], y[idx_next, :], w[idx_next]
-            opt_state = update(i * n_batches + b, opt_state, next_batch, penalty_l2,
-                               penalty_orthogonal)
+            opt_state = update(
+                i * n_batches + b, opt_state, next_batch, penalty_l2, penalty_orthogonal
+            )
 
         if (verbose > 0 and i % n_iter_print == 0) or early_stopping:
             params_curr = get_params(opt_state)
-            l_curr = loss_snet_noprop(params_curr, (X_val, y_val, w_val),
-                                penalty_l2, penalty_orthogonal)
+            l_curr = loss_snet_noprop(
+                params_curr, (X_val, y_val, w_val), penalty_l2, penalty_orthogonal
+            )
 
         if verbose > 0 and i % n_iter_print == 0:
-            print("Epoch: {}, current {} loss {}".format(i,
-                                                         val_string, l_curr))
+            print(f"Epoch: {i}, current {val_string} loss {l_curr}")
 
         if early_stopping and ((i + 1) * n_batches > n_iter_min):
             # check if loss updated
@@ -619,8 +828,7 @@ def train_snet_noprop(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT
             if p_curr > patience:
                 if return_val_loss:
                     # return loss without penalty
-                    l_final = loss_snet_noprop(params_curr, (X_val, y_val, w_val), 0,
-                                         0)
+                    l_final = loss_snet_noprop(params_curr, (X_val, y_val, w_val), 0, 0)
                     return params_curr, (predict_fun_repr, predict_fun_head_po), l_final
 
                 return params_curr, (predict_fun_repr, predict_fun_head_po)
@@ -636,16 +844,24 @@ def train_snet_noprop(X, y, w, binary_y: bool = False, n_layers_r: int = DEFAULT
     return trained_params, (predict_fun_repr, predict_fun_head_po)
 
 
-def predict_snet_noprop(X, trained_params, predict_funs, return_po: bool = False,
-                        return_prop: bool = False):
+def predict_snet_noprop(
+    X: jnp.ndarray,
+    trained_params: dict,
+    predict_funs: list,
+    return_po: bool = False,
+    return_prop: bool = False,
+) -> jnp.ndarray:
 
     if return_prop:
-        raise NotImplementedError('SNet5 does not have propensity estimator')
+        raise NotImplementedError("SNet5 does not have propensity estimator")
 
     # unpack inputs
     predict_fun_repr, predict_fun_head = predict_funs
-    param_repr_o, param_repr_po0, param_repr_po1 = trained_params[0], trained_params[1], \
-                                                   trained_params[2]
+    param_repr_o, param_repr_po0, param_repr_po1 = (
+        trained_params[0],
+        trained_params[1],
+        trained_params[2],
+    )
     param_0, param_1 = trained_params[3], trained_params[4]
 
     # get representations

@@ -2,21 +2,49 @@
 Author: Alicia Curth
 Implements NN based on R-learner and U-learner (as discussed in Nie & Wager (2017))
 """
+from typing import Any, Callable, Optional
+
+import jax.numpy as jnp
 import numpy as onp
 import pandas as pd
-
+from jax import grad, jit, random
+from jax.experimental import optimizers
 from sklearn.model_selection import StratifiedKFold
 
-from jax import jit, grad, random
-import jax.numpy as jnp
-from jax.experimental import optimizers
-
-from catenets.models.constants import *
-from catenets.models.base import BaseCATENet, train_output_net_only, make_val_split, OutputHead
+from catenets.models.base import (
+    BaseCATENet,
+    OutputHead,
+    make_val_split,
+    train_output_net_only,
+)
+from catenets.models.constants import (
+    DEFAULT_AVG_OBJECTIVE,
+    DEFAULT_BATCH_SIZE,
+    DEFAULT_CF_FOLDS,
+    DEFAULT_LAYERS_OUT,
+    DEFAULT_LAYERS_OUT_T,
+    DEFAULT_LAYERS_R,
+    DEFAULT_LAYERS_R_T,
+    DEFAULT_N_ITER,
+    DEFAULT_N_ITER_MIN,
+    DEFAULT_N_ITER_PRINT,
+    DEFAULT_NONLIN,
+    DEFAULT_PATIENCE,
+    DEFAULT_PENALTY_L2,
+    DEFAULT_SEED,
+    DEFAULT_STEP_SIZE,
+    DEFAULT_STEP_SIZE_T,
+    DEFAULT_UNITS_OUT,
+    DEFAULT_UNITS_OUT_T,
+    DEFAULT_UNITS_R,
+    DEFAULT_UNITS_R_T,
+    DEFAULT_VAL_SPLIT,
+    LARGE_VAL,
+)
 from catenets.models.model_utils import check_shape_1d_data, check_X_is_np
 
-R_STRATEGY_NAME = 'R'
-U_STRATEGY_NAME = 'U'
+R_STRATEGY_NAME = "R"
+U_STRATEGY_NAME = "U"
 
 
 class RNet(BaseCATENet):
@@ -80,29 +108,36 @@ class RNet(BaseCATENet):
     nonlin: string, default 'elu'
         Nonlinearity to use in NN
     """
-    def __init__(self, second_stage_strategy: str = R_STRATEGY_NAME,
-                 data_split: bool = False,
-                 cross_fit: bool = False, n_cf_folds: int = DEFAULT_CF_FOLDS,
-                 n_layers_out: int = DEFAULT_LAYERS_OUT,
-                 n_layers_r: int = DEFAULT_LAYERS_R,
-                 n_layers_out_t: int = DEFAULT_LAYERS_OUT_T,
-                 n_layers_r_t: int = DEFAULT_LAYERS_R_T,
-                 n_units_out: int = DEFAULT_UNITS_OUT,
-                 n_units_r: int = DEFAULT_UNITS_R,
-                 n_units_out_t: int = DEFAULT_UNITS_OUT_T,
-                 n_units_r_t: int = DEFAULT_UNITS_R_T,
-                 penalty_l2: float = DEFAULT_PENALTY_L2,
-                 penalty_l2_t: float = DEFAULT_PENALTY_L2,
-                 step_size: float = DEFAULT_STEP_SIZE,
-                 step_size_t: float = DEFAULT_STEP_SIZE_T,
-                 n_iter: int = DEFAULT_N_ITER,
-                 batch_size: int = DEFAULT_BATCH_SIZE,
-                 n_iter_min: int = DEFAULT_N_ITER_MIN,
-                 val_split_prop: float = DEFAULT_VAL_SPLIT,
-                 early_stopping: bool = True,
-                 patience: int = DEFAULT_PATIENCE,
-                 verbose: int = 1, n_iter_print: int = DEFAULT_N_ITER_PRINT,
-                 seed: int = DEFAULT_SEED, nonlin: str = DEFAULT_NONLIN):
+
+    def __init__(
+        self,
+        second_stage_strategy: str = R_STRATEGY_NAME,
+        data_split: bool = False,
+        cross_fit: bool = False,
+        n_cf_folds: int = DEFAULT_CF_FOLDS,
+        n_layers_out: int = DEFAULT_LAYERS_OUT,
+        n_layers_r: int = DEFAULT_LAYERS_R,
+        n_layers_out_t: int = DEFAULT_LAYERS_OUT_T,
+        n_layers_r_t: int = DEFAULT_LAYERS_R_T,
+        n_units_out: int = DEFAULT_UNITS_OUT,
+        n_units_r: int = DEFAULT_UNITS_R,
+        n_units_out_t: int = DEFAULT_UNITS_OUT_T,
+        n_units_r_t: int = DEFAULT_UNITS_R_T,
+        penalty_l2: float = DEFAULT_PENALTY_L2,
+        penalty_l2_t: float = DEFAULT_PENALTY_L2,
+        step_size: float = DEFAULT_STEP_SIZE,
+        step_size_t: float = DEFAULT_STEP_SIZE_T,
+        n_iter: int = DEFAULT_N_ITER,
+        batch_size: int = DEFAULT_BATCH_SIZE,
+        n_iter_min: int = DEFAULT_N_ITER_MIN,
+        val_split_prop: float = DEFAULT_VAL_SPLIT,
+        early_stopping: bool = True,
+        patience: int = DEFAULT_PATIENCE,
+        verbose: int = 1,
+        n_iter_print: int = DEFAULT_N_ITER_PRINT,
+        seed: int = DEFAULT_SEED,
+        nonlin: str = DEFAULT_NONLIN,
+    ) -> None:
         # settings
         self.second_stage_strategy = second_stage_strategy
         self.data_split = data_split
@@ -135,10 +170,16 @@ class RNet(BaseCATENet):
         self.patience = patience
         self.n_iter_min = n_iter_min
 
-    def _get_train_function(self):
+    def _get_train_function(self) -> Callable:
         return train_r_net
 
-    def fit(self, X, y, w, p=None):
+    def fit(
+        self,
+        X: jnp.ndarray,
+        y: jnp.ndarray,
+        w: jnp.ndarray,
+        p: Optional[jnp.ndarray] = None,
+    ) -> "RNet":
         # overwrite super so we can pass p as extra param
         # some quick input checks
         X = check_X_is_np(X)
@@ -149,47 +190,62 @@ class RNet(BaseCATENet):
 
         self._params, self._predict_funs = train_func(X, y, w, p, **train_params)
 
-    def _get_predict_function(self):
+        return self
+
+    def _get_predict_function(self) -> Callable:
         # Two step nets do not need this
         pass
 
-    def predict(self, X, return_po: bool = False, return_prop: bool = False):
+    def predict(
+        self, X: jnp.ndarray, return_po: bool = False, return_prop: bool = False
+    ) -> jnp.ndarray:
         # check input
         if return_po:
-            raise NotImplementedError('TwoStepNets have no Potential outcome predictors.')
+            raise NotImplementedError(
+                "TwoStepNets have no Potential outcome predictors."
+            )
 
         if return_prop:
-            raise NotImplementedError('TwoStepNets have no Propensity predictors.')
+            raise NotImplementedError("TwoStepNets have no Propensity predictors.")
 
         if isinstance(X, pd.DataFrame):
             X = X.values
         return self._predict_funs(self._params, X)
 
 
-def train_r_net(X, y, w, p=None, second_stage_strategy: str = R_STRATEGY_NAME,
-                data_split: bool = False,
-                cross_fit: bool = False, n_cf_folds: int = DEFAULT_CF_FOLDS,
-                n_layers_out: int = DEFAULT_LAYERS_OUT,
-                n_layers_r: int = DEFAULT_LAYERS_R,
-                n_layers_r_t: int = DEFAULT_LAYERS_R_T,
-                n_layers_out_t: int = DEFAULT_LAYERS_OUT_T,
-                n_units_out: int = DEFAULT_UNITS_OUT,
-                n_units_r: int = DEFAULT_UNITS_R,
-                n_units_out_t: int = DEFAULT_UNITS_OUT_T,
-                n_units_r_t: int = DEFAULT_UNITS_R_T,
-                penalty_l2: float = DEFAULT_PENALTY_L2,
-                penalty_l2_t: float = DEFAULT_PENALTY_L2,
-                step_size: float = DEFAULT_STEP_SIZE,
-                step_size_t: float = DEFAULT_STEP_SIZE_T,
-                n_iter: int = DEFAULT_N_ITER,
-                batch_size: int = DEFAULT_BATCH_SIZE,
-                val_split_prop: float = DEFAULT_VAL_SPLIT,
-                early_stopping: bool = True,
-                patience: int = DEFAULT_PATIENCE,
-                n_iter_min: int = DEFAULT_N_ITER_MIN,
-                verbose: int = 1, n_iter_print: int = DEFAULT_N_ITER_PRINT,
-                seed: int = DEFAULT_SEED,
-                return_val_loss: bool = False, nonlin: str = DEFAULT_NONLIN):
+def train_r_net(
+    X: jnp.ndarray,
+    y: jnp.ndarray,
+    w: jnp.ndarray,
+    p: Optional[jnp.ndarray] = None,
+    second_stage_strategy: str = R_STRATEGY_NAME,
+    data_split: bool = False,
+    cross_fit: bool = False,
+    n_cf_folds: int = DEFAULT_CF_FOLDS,
+    n_layers_out: int = DEFAULT_LAYERS_OUT,
+    n_layers_r: int = DEFAULT_LAYERS_R,
+    n_layers_r_t: int = DEFAULT_LAYERS_R_T,
+    n_layers_out_t: int = DEFAULT_LAYERS_OUT_T,
+    n_units_out: int = DEFAULT_UNITS_OUT,
+    n_units_r: int = DEFAULT_UNITS_R,
+    n_units_out_t: int = DEFAULT_UNITS_OUT_T,
+    n_units_r_t: int = DEFAULT_UNITS_R_T,
+    penalty_l2: float = DEFAULT_PENALTY_L2,
+    penalty_l2_t: float = DEFAULT_PENALTY_L2,
+    step_size: float = DEFAULT_STEP_SIZE,
+    step_size_t: float = DEFAULT_STEP_SIZE_T,
+    n_iter: int = DEFAULT_N_ITER,
+    batch_size: int = DEFAULT_BATCH_SIZE,
+    val_split_prop: float = DEFAULT_VAL_SPLIT,
+    early_stopping: bool = True,
+    patience: int = DEFAULT_PATIENCE,
+    n_iter_min: int = DEFAULT_N_ITER_MIN,
+    verbose: int = 1,
+    n_iter_print: int = DEFAULT_N_ITER_PRINT,
+    seed: int = DEFAULT_SEED,
+    return_val_loss: bool = False,
+    nonlin: str = DEFAULT_NONLIN,
+) -> Any:
     # get shape of data
     n, d = X.shape
 
@@ -200,36 +256,43 @@ def train_r_net(X, y, w, p=None, second_stage_strategy: str = R_STRATEGY_NAME,
     if not cross_fit:
         if not data_split:
             if verbose > 0:
-                print('Training first stage with all data (no data splitting)')
+                print("Training first stage with all data (no data splitting)")
             # use all data for both
             fit_mask = onp.ones(n, dtype=bool)
             pred_mask = onp.ones(n, dtype=bool)
         else:
             if verbose > 0:
-                print('Training first stage with half of the data (data splitting)')
+                print("Training first stage with half of the data (data splitting)")
             # split data in half
             fit_idx = onp.random.choice(n, int(onp.round(n / 2)))
             fit_mask = onp.zeros(n, dtype=bool)
 
             fit_mask[fit_idx] = 1
-            pred_mask = ~ fit_mask
+            pred_mask = ~fit_mask
 
-        mu_hat, pi_hat = _train_and_predict_r_stage1(X, y, w, fit_mask, pred_mask,
-                                                     n_layers_out=n_layers_out,
-                                                     n_layers_r=n_layers_r,
-                                                     n_units_out=n_units_out,
-                                                     n_units_r=n_units_r,
-                                                     penalty_l2=penalty_l2,
-                                                     step_size=step_size,
-                                                     n_iter=n_iter,
-                                                     batch_size=batch_size,
-                                                     val_split_prop=val_split_prop,
-                                                     early_stopping=early_stopping,
-                                                     patience=patience,
-                                                     n_iter_min=n_iter_min,
-                                                     verbose=verbose,
-                                                     n_iter_print=n_iter_print,
-                                                     seed=seed, nonlin=nonlin)
+        mu_hat, pi_hat = _train_and_predict_r_stage1(
+            X,
+            y,
+            w,
+            fit_mask,
+            pred_mask,
+            n_layers_out=n_layers_out,
+            n_layers_r=n_layers_r,
+            n_units_out=n_units_out,
+            n_units_r=n_units_r,
+            penalty_l2=penalty_l2,
+            step_size=step_size,
+            n_iter=n_iter,
+            batch_size=batch_size,
+            val_split_prop=val_split_prop,
+            early_stopping=early_stopping,
+            patience=patience,
+            n_iter_min=n_iter_min,
+            verbose=verbose,
+            n_iter_print=n_iter_print,
+            seed=seed,
+            nonlin=nonlin,
+        )
         if data_split:
             # keep only prediction data
             X, y, w = X[pred_mask, :], y[pred_mask, :], w[pred_mask, :]
@@ -239,43 +302,48 @@ def train_r_net(X, y, w, p=None, second_stage_strategy: str = R_STRATEGY_NAME,
 
     else:
         if verbose > 0:
-            print('Training first stage in {} folds (cross-fitting)'.format(n_cf_folds))
+            print(f"Training first stage in {n_cf_folds} folds (cross-fitting)")
         # do cross fitting
         mu_hat, pi_hat = onp.zeros((n, 1)), onp.zeros((n, 1))
-        splitter = StratifiedKFold(n_splits=n_cf_folds, shuffle=True,
-                                   random_state=seed)
+        splitter = StratifiedKFold(n_splits=n_cf_folds, shuffle=True, random_state=seed)
 
         fold_count = 1
         for train_idx, test_idx in splitter.split(X, w):
 
             if verbose > 0:
-                print('Training fold {}.'.format(fold_count))
+                print(f"Training fold {fold_count}.")
             fold_count = fold_count + 1
 
             pred_mask = onp.zeros(n, dtype=bool)
             pred_mask[test_idx] = 1
-            fit_mask = ~ pred_mask
+            fit_mask = ~pred_mask
 
-            mu_hat[pred_mask], pi_hat[pred_mask] = \
-                _train_and_predict_r_stage1(X, y, w, fit_mask, pred_mask,
-                                            n_layers_out=n_layers_out,
-                                            n_layers_r=n_layers_r,
-                                            n_units_out=n_units_out,
-                                            n_units_r=n_units_r,
-                                            penalty_l2=penalty_l2,
-                                            step_size=step_size,
-                                            n_iter=n_iter,
-                                            batch_size=batch_size,
-                                            val_split_prop=val_split_prop,
-                                            early_stopping=early_stopping,
-                                            patience=patience,
-                                            n_iter_min=n_iter_min,
-                                            verbose=verbose,
-                                            n_iter_print=n_iter_print,
-                                            seed=seed, nonlin=nonlin)
+            mu_hat[pred_mask], pi_hat[pred_mask] = _train_and_predict_r_stage1(
+                X,
+                y,
+                w,
+                fit_mask,
+                pred_mask,
+                n_layers_out=n_layers_out,
+                n_layers_r=n_layers_r,
+                n_units_out=n_units_out,
+                n_units_r=n_units_r,
+                penalty_l2=penalty_l2,
+                step_size=step_size,
+                n_iter=n_iter,
+                batch_size=batch_size,
+                val_split_prop=val_split_prop,
+                early_stopping=early_stopping,
+                patience=patience,
+                n_iter_min=n_iter_min,
+                verbose=verbose,
+                n_iter_print=n_iter_print,
+                seed=seed,
+                nonlin=nonlin,
+            )
 
     if verbose > 0:
-        print('Training second stage.')
+        print("Training second stage.")
 
     if p is not None:
         # use known propensity score
@@ -287,44 +355,77 @@ def train_r_net(X, y, w, p=None, second_stage_strategy: str = R_STRATEGY_NAME,
     y_ortho = y - mu_hat
 
     if second_stage_strategy == R_STRATEGY_NAME:
-        return train_r_stage2(X, y_ortho, w_ortho, n_layers_out=n_layers_out_t,
-                              n_units_out=n_units_out_t, n_layers_r=n_layers_r_t,
-                              n_units_r=n_units_r_t,
-                              penalty_l2=penalty_l2_t, step_size=step_size_t, n_iter=n_iter,
-                              batch_size=batch_size, val_split_prop=val_split_prop,
-                              early_stopping=early_stopping, patience=patience,
-                              n_iter_min=n_iter_min,
-                              verbose=verbose, n_iter_print=n_iter_print,
-                              seed=seed, return_val_loss=return_val_loss, nonlin=nonlin)
+        return train_r_stage2(
+            X,
+            y_ortho,
+            w_ortho,
+            n_layers_out=n_layers_out_t,
+            n_units_out=n_units_out_t,
+            n_layers_r=n_layers_r_t,
+            n_units_r=n_units_r_t,
+            penalty_l2=penalty_l2_t,
+            step_size=step_size_t,
+            n_iter=n_iter,
+            batch_size=batch_size,
+            val_split_prop=val_split_prop,
+            early_stopping=early_stopping,
+            patience=patience,
+            n_iter_min=n_iter_min,
+            verbose=verbose,
+            n_iter_print=n_iter_print,
+            seed=seed,
+            return_val_loss=return_val_loss,
+            nonlin=nonlin,
+        )
     elif second_stage_strategy == U_STRATEGY_NAME:
-        return train_output_net_only(X, y_ortho / w_ortho, n_layers_out=n_layers_out_t,
-                                     n_units_out=n_units_out_t, n_layers_r=n_layers_r_t,
-                                     n_units_r=n_units_r_t,
-                                     penalty_l2=penalty_l2_t, step_size=step_size_t, n_iter=n_iter,
-                                     batch_size=batch_size, val_split_prop=val_split_prop,
-                                     early_stopping=early_stopping, patience=patience,
-                                     n_iter_min=n_iter_min,
-                                     verbose=verbose, n_iter_print=n_iter_print,
-                                     seed=seed, return_val_loss=return_val_loss, nonlin=nonlin)
+        return train_output_net_only(
+            X,
+            y_ortho / w_ortho,
+            n_layers_out=n_layers_out_t,
+            n_units_out=n_units_out_t,
+            n_layers_r=n_layers_r_t,
+            n_units_r=n_units_r_t,
+            penalty_l2=penalty_l2_t,
+            step_size=step_size_t,
+            n_iter=n_iter,
+            batch_size=batch_size,
+            val_split_prop=val_split_prop,
+            early_stopping=early_stopping,
+            patience=patience,
+            n_iter_min=n_iter_min,
+            verbose=verbose,
+            n_iter_print=n_iter_print,
+            seed=seed,
+            return_val_loss=return_val_loss,
+            nonlin=nonlin,
+        )
     else:
-        raise ValueError('R-learner only supports strategies R and U.')
+        raise ValueError("R-learner only supports strategies R and U.")
 
 
-def _train_and_predict_r_stage1(X, y, w, fit_mask, pred_mask,
-                                n_layers_out: int = DEFAULT_LAYERS_OUT,
-                                n_units_out: int = DEFAULT_UNITS_OUT,
-                                n_layers_r: int = DEFAULT_LAYERS_R,
-                                n_units_r: int = DEFAULT_UNITS_R,
-                                penalty_l2: float = DEFAULT_PENALTY_L2,
-                                step_size: float = DEFAULT_STEP_SIZE,
-                                n_iter: int = DEFAULT_N_ITER,
-                                batch_size: int = DEFAULT_BATCH_SIZE,
-                                val_split_prop: float = DEFAULT_VAL_SPLIT,
-                                early_stopping: bool = True,
-                                patience: int = DEFAULT_PATIENCE,
-                                n_iter_min: int = DEFAULT_N_ITER_MIN,
-                                verbose: int = 1, n_iter_print: int = DEFAULT_N_ITER_PRINT,
-                                seed: int = DEFAULT_SEED, nonlin: str = DEFAULT_NONLIN):
+def _train_and_predict_r_stage1(
+    X: jnp.ndarray,
+    y: jnp.ndarray,
+    w: jnp.ndarray,
+    fit_mask: jnp.ndarray,
+    pred_mask: jnp.ndarray,
+    n_layers_out: int = DEFAULT_LAYERS_OUT,
+    n_units_out: int = DEFAULT_UNITS_OUT,
+    n_layers_r: int = DEFAULT_LAYERS_R,
+    n_units_r: int = DEFAULT_UNITS_R,
+    penalty_l2: float = DEFAULT_PENALTY_L2,
+    step_size: float = DEFAULT_STEP_SIZE,
+    n_iter: int = DEFAULT_N_ITER,
+    batch_size: int = DEFAULT_BATCH_SIZE,
+    val_split_prop: float = DEFAULT_VAL_SPLIT,
+    early_stopping: bool = True,
+    patience: int = DEFAULT_PATIENCE,
+    n_iter_min: int = DEFAULT_N_ITER_MIN,
+    verbose: int = 1,
+    n_iter_print: int = DEFAULT_N_ITER_PRINT,
+    seed: int = DEFAULT_SEED,
+    nonlin: str = DEFAULT_NONLIN,
+) -> Any:
     if len(w.shape) > 1:
         w = w.reshape((len(w),))
 
@@ -333,61 +434,80 @@ def _train_and_predict_r_stage1(X, y, w, fit_mask, pred_mask,
     X_pred = X[pred_mask, :]
 
     if verbose > 0:
-        print('Training output Net')
-    params_out, predict_fun_out = train_output_net_only(X_fit, y_fit,
-                                                        n_layers_out=n_layers_out,
-                                                        n_units_out=n_units_out,
-                                                        n_layers_r=n_layers_r,
-                                                        n_units_r=n_units_r,
-                                                        penalty_l2=penalty_l2,
-                                                        step_size=step_size,
-                                                        n_iter=n_iter,
-                                                        batch_size=batch_size,
-                                                        val_split_prop=val_split_prop,
-                                                        early_stopping=early_stopping,
-                                                        patience=patience,
-                                                        n_iter_min=n_iter_min,
-                                                        n_iter_print=n_iter_print,
-                                                        verbose=verbose,
-                                                        seed=seed, nonlin=nonlin)
+        print("Training output Net")
+    params_out, predict_fun_out = train_output_net_only(
+        X_fit,
+        y_fit,
+        n_layers_out=n_layers_out,
+        n_units_out=n_units_out,
+        n_layers_r=n_layers_r,
+        n_units_r=n_units_r,
+        penalty_l2=penalty_l2,
+        step_size=step_size,
+        n_iter=n_iter,
+        batch_size=batch_size,
+        val_split_prop=val_split_prop,
+        early_stopping=early_stopping,
+        patience=patience,
+        n_iter_min=n_iter_min,
+        n_iter_print=n_iter_print,
+        verbose=verbose,
+        seed=seed,
+        nonlin=nonlin,
+    )
     mu_hat = predict_fun_out(params_out, X_pred)
 
     if verbose > 0:
-        print('Training propensity net')
-    params_prop, predict_fun_prop = train_output_net_only(X_fit, w_fit,
-                                                          binary_y=True,
-                                                          n_layers_out=n_layers_out,
-                                                          n_units_out=n_units_out,
-                                                          n_layers_r=n_layers_r,
-                                                          n_units_r=n_units_r,
-                                                          penalty_l2=penalty_l2,
-                                                          step_size=step_size,
-                                                          n_iter=n_iter,
-                                                          batch_size=batch_size,
-                                                          val_split_prop=val_split_prop,
-                                                          early_stopping=early_stopping,
-                                                          patience=patience,
-                                                          n_iter_min=n_iter_min,
-                                                          n_iter_print=n_iter_print,
-                                                          verbose=verbose,
-                                                          seed=seed, nonlin=nonlin)
+        print("Training propensity net")
+    params_prop, predict_fun_prop = train_output_net_only(
+        X_fit,
+        w_fit,
+        binary_y=True,
+        n_layers_out=n_layers_out,
+        n_units_out=n_units_out,
+        n_layers_r=n_layers_r,
+        n_units_r=n_units_r,
+        penalty_l2=penalty_l2,
+        step_size=step_size,
+        n_iter=n_iter,
+        batch_size=batch_size,
+        val_split_prop=val_split_prop,
+        early_stopping=early_stopping,
+        patience=patience,
+        n_iter_min=n_iter_min,
+        n_iter_print=n_iter_print,
+        verbose=verbose,
+        seed=seed,
+        nonlin=nonlin,
+    )
     pi_hat = predict_fun_prop(params_prop, X_pred)
 
     return mu_hat, pi_hat
 
 
-def train_r_stage2(X, y_ortho, w_ortho,
-                   n_layers_out: int = DEFAULT_LAYERS_OUT,
-                   n_units_out: int = DEFAULT_UNITS_OUT,
-                   n_layers_r: int = 0, n_units_r: int = DEFAULT_UNITS_R,
-                   penalty_l2: float = DEFAULT_PENALTY_L2,
-                   step_size: float = DEFAULT_STEP_SIZE,
-                   n_iter: int = DEFAULT_N_ITER, batch_size: int = DEFAULT_BATCH_SIZE,
-                   val_split_prop: float = DEFAULT_VAL_SPLIT, early_stopping: bool = True,
-                   patience: int = DEFAULT_PATIENCE, n_iter_min: int = DEFAULT_N_ITER_MIN,
-                   verbose: int = 1, n_iter_print: int = DEFAULT_N_ITER_PRINT,
-                   seed: int = DEFAULT_SEED, return_val_loss: bool = False,
-                   nonlin: str = DEFAULT_NONLIN, avg_objective: bool = DEFAULT_AVG_OBJECTIVE):
+def train_r_stage2(
+    X: jnp.ndarray,
+    y_ortho: jnp.ndarray,
+    w_ortho: jnp.ndarray,
+    n_layers_out: int = DEFAULT_LAYERS_OUT,
+    n_units_out: int = DEFAULT_UNITS_OUT,
+    n_layers_r: int = 0,
+    n_units_r: int = DEFAULT_UNITS_R,
+    penalty_l2: float = DEFAULT_PENALTY_L2,
+    step_size: float = DEFAULT_STEP_SIZE,
+    n_iter: int = DEFAULT_N_ITER,
+    batch_size: int = DEFAULT_BATCH_SIZE,
+    val_split_prop: float = DEFAULT_VAL_SPLIT,
+    early_stopping: bool = True,
+    patience: int = DEFAULT_PATIENCE,
+    n_iter_min: int = DEFAULT_N_ITER_MIN,
+    verbose: int = 1,
+    n_iter_print: int = DEFAULT_N_ITER_PRINT,
+    seed: int = DEFAULT_SEED,
+    return_val_loss: bool = False,
+    nonlin: str = DEFAULT_NONLIN,
+    avg_objective: bool = DEFAULT_AVG_OBJECTIVE,
+) -> Any:
     # function to train a single output head
     # input check
     y_ortho, w_ortho = check_shape_1d_data(y_ortho), check_shape_1d_data(w_ortho)
@@ -397,31 +517,42 @@ def train_r_stage2(X, y_ortho, w_ortho,
     onp.random.seed(seed)  # set seed for data generation via numpy as well
 
     # get validation split (can be none)
-    X, y_ortho, w_ortho, X_val, y_val, w_val, val_string = make_val_split(X, y_ortho, w_ortho,
-                                                                          val_split_prop=val_split_prop,
-                                                                          seed=seed,
-                                                                          stratify_w=False)
+    X, y_ortho, w_ortho, X_val, y_val, w_val, val_string = make_val_split(
+        X, y_ortho, w_ortho, val_split_prop=val_split_prop, seed=seed, stratify_w=False
+    )
     n = X.shape[0]  # could be different from before due to split
 
     # get output head
-    init_fun, predict_fun = OutputHead(n_layers_out=n_layers_out, n_units_out=n_units_out,
-                                       n_layers_r=n_layers_r, n_units_r=n_units_r, nonlin=nonlin)
+    init_fun, predict_fun = OutputHead(
+        n_layers_out=n_layers_out,
+        n_units_out=n_units_out,
+        n_layers_r=n_layers_r,
+        n_units_r=n_units_r,
+        nonlin=nonlin,
+    )
 
     # define loss and grad
     @jit
-    def loss(params, batch, penalty):
+    def loss(params: dict, batch: jnp.ndarray, penalty: float) -> jnp.ndarray:
         # mse loss function
         inputs, ortho_targets, ortho_treats = batch
         preds = predict_fun(params, inputs)
-        weightsq = sum([jnp.sum(params[i][0] ** 2) for i in range(0, 2 * (n_layers_out +
-                                                                          n_layers_r) + 1, 2)])
+        weightsq = sum(
+            [
+                jnp.sum(params[i][0] ** 2)
+                for i in range(0, 2 * (n_layers_out + n_layers_r) + 1, 2)
+            ]
+        )
         if not avg_objective:
-            return jnp.sum((ortho_targets - ortho_treats * preds) ** 2) + \
-               0.5 * penalty * weightsq
+            return (
+                jnp.sum((ortho_targets - ortho_treats * preds) ** 2)
+                + 0.5 * penalty * weightsq
+            )
         else:
-            return jnp.average((ortho_targets - ortho_treats * preds) ** 2) + \
-               0.5 * penalty * weightsq
-
+            return (
+                jnp.average((ortho_targets - ortho_treats * preds) ** 2)
+                + 0.5 * penalty * weightsq
+            )
 
     # set optimization routine
     # set optimizer
@@ -429,7 +560,7 @@ def train_r_stage2(X, y_ortho, w_ortho,
 
     # set update function
     @jit
-    def update(i, state, batch, penalty):
+    def update(i: int, state: dict, batch: jnp.ndarray, penalty: float) -> jnp.ndarray:
         params = get_params(state)
         g_params = grad(loss)(params, batch, penalty)
         # g_params = optimizers.clip_grads(g_params, 1.0)
@@ -452,7 +583,9 @@ def train_r_stage2(X, y_ortho, w_ortho,
         # shuffle data for minibatches
         onp.random.shuffle(train_indices)
         for b in range(n_batches):
-            idx_next = train_indices[(b * batch_size):min((b + 1) * batch_size, n - 1)]
+            idx_next = train_indices[
+                (b * batch_size) : min((b + 1) * batch_size, n - 1)
+            ]
             next_batch = X[idx_next, :], y_ortho[idx_next, :], w_ortho[idx_next, :]
             opt_state = update(i * n_batches + b, opt_state, next_batch, penalty_l2)
 
@@ -461,7 +594,7 @@ def train_r_stage2(X, y_ortho, w_ortho,
             l_curr = loss(params_curr, (X_val, y_val, w_val), penalty_l2)
 
         if verbose > 0 and i % n_iter_print == 0:
-            print("Epoch: {}, current {} loss: {}".format(i, val_string, l_curr))
+            print(f"Epoch: {i}, current {val_string} loss: {l_curr}")
 
         if early_stopping and ((i + 1) * n_batches > n_iter_min):
             # check if loss updated

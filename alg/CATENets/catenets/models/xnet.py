@@ -2,10 +2,33 @@
 Author: Alicia Curth
 Module implements X-learner from Kuenzel et al (2019) using NNs
 """
-import pandas as pd
+from typing import Any, Callable, Optional
 
-from catenets.models.constants import *
+import numpy as np
+
 from catenets.models.base import BaseCATENet, train_output_net_only
+from catenets.models.constants import (
+    DEFAULT_AVG_OBJECTIVE,
+    DEFAULT_BATCH_SIZE,
+    DEFAULT_LAYERS_OUT,
+    DEFAULT_LAYERS_OUT_T,
+    DEFAULT_LAYERS_R,
+    DEFAULT_LAYERS_R_T,
+    DEFAULT_N_ITER,
+    DEFAULT_N_ITER_MIN,
+    DEFAULT_N_ITER_PRINT,
+    DEFAULT_NONLIN,
+    DEFAULT_PATIENCE,
+    DEFAULT_PENALTY_L2,
+    DEFAULT_SEED,
+    DEFAULT_STEP_SIZE,
+    DEFAULT_STEP_SIZE_T,
+    DEFAULT_UNITS_OUT,
+    DEFAULT_UNITS_OUT_T,
+    DEFAULT_UNITS_R,
+    DEFAULT_UNITS_R_T,
+    DEFAULT_VAL_SPLIT,
+)
 from catenets.models.model_utils import check_shape_1d_data, check_X_is_np
 
 
@@ -70,28 +93,34 @@ class XNet(BaseCATENet):
     nonlin: string, default 'elu'
         Nonlinearity to use in NN
     """
-    def __init__(self, weight_strategy: int = None,
-                 binary_y: bool = False,
-                 n_layers_out: int = DEFAULT_LAYERS_OUT,
-                 n_layers_r: int = DEFAULT_LAYERS_R,
-                 n_layers_out_t: int = DEFAULT_LAYERS_OUT_T,
-                 n_layers_r_t: int = DEFAULT_LAYERS_R_T,
-                 n_units_out: int = DEFAULT_UNITS_OUT,
-                 n_units_r: int = DEFAULT_UNITS_R,
-                 n_units_out_t: int = DEFAULT_UNITS_OUT_T,
-                 n_units_r_t: int = DEFAULT_UNITS_R_T,
-                 penalty_l2: float = DEFAULT_PENALTY_L2,
-                 penalty_l2_t: float = DEFAULT_PENALTY_L2,
-                 step_size: float = DEFAULT_STEP_SIZE,
-                 step_size_t: float = DEFAULT_STEP_SIZE_T,
-                 n_iter: int = DEFAULT_N_ITER,
-                 batch_size: int = DEFAULT_BATCH_SIZE,
-                 n_iter_min: int = DEFAULT_N_ITER_MIN,
-                 val_split_prop: float = DEFAULT_VAL_SPLIT,
-                 early_stopping: bool = True,
-                 patience: int = DEFAULT_PATIENCE,
-                 verbose: int = 1, n_iter_print: int = DEFAULT_N_ITER_PRINT,
-                 seed: int = DEFAULT_SEED, nonlin: str = DEFAULT_NONLIN):
+
+    def __init__(
+        self,
+        weight_strategy: Optional[int] = None,
+        binary_y: bool = False,
+        n_layers_out: int = DEFAULT_LAYERS_OUT,
+        n_layers_r: int = DEFAULT_LAYERS_R,
+        n_layers_out_t: int = DEFAULT_LAYERS_OUT_T,
+        n_layers_r_t: int = DEFAULT_LAYERS_R_T,
+        n_units_out: int = DEFAULT_UNITS_OUT,
+        n_units_r: int = DEFAULT_UNITS_R,
+        n_units_out_t: int = DEFAULT_UNITS_OUT_T,
+        n_units_r_t: int = DEFAULT_UNITS_R_T,
+        penalty_l2: float = DEFAULT_PENALTY_L2,
+        penalty_l2_t: float = DEFAULT_PENALTY_L2,
+        step_size: float = DEFAULT_STEP_SIZE,
+        step_size_t: float = DEFAULT_STEP_SIZE_T,
+        n_iter: int = DEFAULT_N_ITER,
+        batch_size: int = DEFAULT_BATCH_SIZE,
+        n_iter_min: int = DEFAULT_N_ITER_MIN,
+        val_split_prop: float = DEFAULT_VAL_SPLIT,
+        early_stopping: bool = True,
+        patience: int = DEFAULT_PATIENCE,
+        verbose: int = 1,
+        n_iter_print: int = DEFAULT_N_ITER_PRINT,
+        seed: int = DEFAULT_SEED,
+        nonlin: str = DEFAULT_NONLIN,
+    ) -> None:
         # settings
         self.weight_strategy = weight_strategy
         self.binary_y = binary_y
@@ -122,14 +151,16 @@ class XNet(BaseCATENet):
         self.patience = patience
         self.n_iter_min = n_iter_min
 
-    def _get_train_function(self):
+    def _get_train_function(self) -> Callable:
         return train_x_net
 
-    def _get_predict_function(self):
+    def _get_predict_function(self) -> Callable:
         # Two step nets do not need this
         return predict_x_net
 
-    def predict(self, X, return_po: bool = False, return_prop: bool = False):
+    def predict(
+        self, X: np.ndarray, return_po: bool = False, return_prop: bool = False
+    ) -> np.ndarray:
         """
         Predict treatment effect estimates using a CATENet. Depending on method, can also return
         potential outcome estimate and propensity score estimate.
@@ -149,35 +180,47 @@ class XNet(BaseCATENet):
         """
         X = check_X_is_np(X)
         predict_func = self._get_predict_function()
-        return predict_func(X, trained_params=self._params,
-                            predict_funs=self._predict_funs,
-                            return_po=return_po, return_prop=return_prop,
-                            weight_strategy=self.weight_strategy)
+        return predict_func(
+            X,
+            trained_params=self._params,
+            predict_funs=self._predict_funs,
+            return_po=return_po,
+            return_prop=return_prop,
+            weight_strategy=self.weight_strategy,
+        )
 
 
-def train_x_net(X, y, w, weight_strategy: int = None,
-                binary_y: bool = False,
-                n_layers_out: int = DEFAULT_LAYERS_OUT,
-                n_layers_r: int = DEFAULT_LAYERS_R,
-                n_layers_out_t: int = DEFAULT_LAYERS_OUT_T,
-                n_layers_r_t: int = DEFAULT_LAYERS_R_T,
-                n_units_out: int = DEFAULT_UNITS_OUT,
-                n_units_r: int = DEFAULT_UNITS_R,
-                n_units_out_t: int = DEFAULT_UNITS_OUT_T,
-                n_units_r_t: int = DEFAULT_UNITS_R_T,
-                penalty_l2: float = DEFAULT_PENALTY_L2,
-                penalty_l2_t: float = DEFAULT_PENALTY_L2,
-                step_size: float = DEFAULT_STEP_SIZE,
-                step_size_t: float = DEFAULT_STEP_SIZE_T,
-                n_iter: int = DEFAULT_N_ITER,
-                batch_size: int = DEFAULT_BATCH_SIZE,
-                n_iter_min: int = DEFAULT_N_ITER_MIN,
-                val_split_prop: float = DEFAULT_VAL_SPLIT,
-                early_stopping: bool = True,
-                patience: int = DEFAULT_PATIENCE,
-                verbose: int = 1, n_iter_print: int = DEFAULT_N_ITER_PRINT,
-                seed: int = DEFAULT_SEED, nonlin: str = DEFAULT_NONLIN,
-                return_val_loss: bool = False, avg_objective: bool = DEFAULT_AVG_OBJECTIVE):
+def train_x_net(
+    X: np.ndarray,
+    y: np.ndarray,
+    w: np.ndarray,
+    weight_strategy: Optional[int] = None,
+    binary_y: bool = False,
+    n_layers_out: int = DEFAULT_LAYERS_OUT,
+    n_layers_r: int = DEFAULT_LAYERS_R,
+    n_layers_out_t: int = DEFAULT_LAYERS_OUT_T,
+    n_layers_r_t: int = DEFAULT_LAYERS_R_T,
+    n_units_out: int = DEFAULT_UNITS_OUT,
+    n_units_r: int = DEFAULT_UNITS_R,
+    n_units_out_t: int = DEFAULT_UNITS_OUT_T,
+    n_units_r_t: int = DEFAULT_UNITS_R_T,
+    penalty_l2: float = DEFAULT_PENALTY_L2,
+    penalty_l2_t: float = DEFAULT_PENALTY_L2,
+    step_size: float = DEFAULT_STEP_SIZE,
+    step_size_t: float = DEFAULT_STEP_SIZE_T,
+    n_iter: int = DEFAULT_N_ITER,
+    batch_size: int = DEFAULT_BATCH_SIZE,
+    n_iter_min: int = DEFAULT_N_ITER_MIN,
+    val_split_prop: float = DEFAULT_VAL_SPLIT,
+    early_stopping: bool = True,
+    patience: int = DEFAULT_PATIENCE,
+    verbose: int = 1,
+    n_iter_print: int = DEFAULT_N_ITER_PRINT,
+    seed: int = DEFAULT_SEED,
+    nonlin: str = DEFAULT_NONLIN,
+    return_val_loss: bool = False,
+    avg_objective: bool = DEFAULT_AVG_OBJECTIVE,
+) -> Any:
     y = check_shape_1d_data(y)
     if len(w.shape) > 1:
         w = w.reshape((len(w),))
@@ -188,7 +231,7 @@ def train_x_net(X, y, w, weight_strategy: int = None,
         # weight_strategy=0 sets g(x)=0, weight_strategy=1 sets g(x)=1,
         # weight_strategy=None sets g(x)=pi(x) [propensity score],
         # weight_strategy=-1 sets g(x)=(1-pi(x))
-        raise ValueError('XNet only implements weight_strategy in [0, 1, -1, None]')
+        raise ValueError("XNet only implements weight_strategy in [0, 1, -1, None]")
 
     # first stage: get estimates of PO regression
     if verbose > 0:
@@ -196,50 +239,58 @@ def train_x_net(X, y, w, weight_strategy: int = None,
 
     if not weight_strategy == 1:
         if verbose > 0:
-            print('Training PO_0 Net')
-        params_0, predict_fun_0 = train_output_net_only(X[w == 0], y[w == 0],
-                                                        binary_y=binary_y,
-                                                        n_layers_out=n_layers_out,
-                                                        n_units_out=n_units_out,
-                                                        n_layers_r=n_layers_r,
-                                                        n_units_r=n_units_r,
-                                                        penalty_l2=penalty_l2,
-                                                        step_size=step_size,
-                                                        n_iter=n_iter,
-                                                        batch_size=batch_size,
-                                                        val_split_prop=val_split_prop,
-                                                        early_stopping=early_stopping,
-                                                        patience=patience,
-                                                        n_iter_min=n_iter_min,
-                                                        n_iter_print=n_iter_print,
-                                                        verbose=verbose,
-                                                        seed=seed, nonlin=nonlin,
-                                                        avg_objective=avg_objective)
+            print("Training PO_0 Net")
+        params_0, predict_fun_0 = train_output_net_only(
+            X[w == 0],
+            y[w == 0],
+            binary_y=binary_y,
+            n_layers_out=n_layers_out,
+            n_units_out=n_units_out,
+            n_layers_r=n_layers_r,
+            n_units_r=n_units_r,
+            penalty_l2=penalty_l2,
+            step_size=step_size,
+            n_iter=n_iter,
+            batch_size=batch_size,
+            val_split_prop=val_split_prop,
+            early_stopping=early_stopping,
+            patience=patience,
+            n_iter_min=n_iter_min,
+            n_iter_print=n_iter_print,
+            verbose=verbose,
+            seed=seed,
+            nonlin=nonlin,
+            avg_objective=avg_objective,
+        )
         mu_hat_0 = predict_fun_0(params_0, X[w == 1])
     else:
         mu_hat_0 = None
 
     if not weight_strategy == 0:
         if verbose > 0:
-            print('Training PO_1 Net')
-        params_1, predict_fun_1 = train_output_net_only(X[w == 1], y[w == 1],
-                                                        binary_y=binary_y,
-                                                        n_layers_out=n_layers_out,
-                                                        n_units_out=n_units_out,
-                                                        n_layers_r=n_layers_r,
-                                                        n_units_r=n_units_r,
-                                                        penalty_l2=penalty_l2,
-                                                        step_size=step_size,
-                                                        n_iter=n_iter,
-                                                        batch_size=batch_size,
-                                                        val_split_prop=val_split_prop,
-                                                        early_stopping=early_stopping,
-                                                        patience=patience,
-                                                        n_iter_min=n_iter_min,
-                                                        n_iter_print=n_iter_print,
-                                                        verbose=verbose,
-                                                        seed=seed, nonlin=nonlin,
-                                                        avg_objective=avg_objective)
+            print("Training PO_1 Net")
+        params_1, predict_fun_1 = train_output_net_only(
+            X[w == 1],
+            y[w == 1],
+            binary_y=binary_y,
+            n_layers_out=n_layers_out,
+            n_units_out=n_units_out,
+            n_layers_r=n_layers_r,
+            n_units_r=n_units_r,
+            penalty_l2=penalty_l2,
+            step_size=step_size,
+            n_iter=n_iter,
+            batch_size=batch_size,
+            val_split_prop=val_split_prop,
+            early_stopping=early_stopping,
+            patience=patience,
+            n_iter_min=n_iter_min,
+            n_iter_print=n_iter_print,
+            verbose=verbose,
+            seed=seed,
+            nonlin=nonlin,
+            avg_objective=avg_objective,
+        )
         mu_hat_1 = predict_fun_1(params_1, X[w == 0])
     else:
         mu_hat_1 = None
@@ -247,25 +298,29 @@ def train_x_net(X, y, w, weight_strategy: int = None,
     if weight_strategy is None or weight_strategy == -1:
         # also fit propensity estimator
         if verbose > 0:
-            print('Training propensity net')
-        params_prop, predict_fun_prop = train_output_net_only(X, w,
-                                                              binary_y=True,
-                                                              n_layers_out=n_layers_out,
-                                                              n_units_out=n_units_out,
-                                                              n_layers_r=n_layers_r,
-                                                              n_units_r=n_units_r,
-                                                              penalty_l2=penalty_l2,
-                                                              step_size=step_size,
-                                                              n_iter=n_iter,
-                                                              batch_size=batch_size,
-                                                              val_split_prop=val_split_prop,
-                                                              early_stopping=early_stopping,
-                                                              patience=patience,
-                                                              n_iter_min=n_iter_min,
-                                                              n_iter_print=n_iter_print,
-                                                              verbose=verbose,
-                                                              seed=seed, nonlin=nonlin,
-                                                              avg_objective=avg_objective)
+            print("Training propensity net")
+        params_prop, predict_fun_prop = train_output_net_only(
+            X,
+            w,
+            binary_y=True,
+            n_layers_out=n_layers_out,
+            n_units_out=n_units_out,
+            n_layers_r=n_layers_r,
+            n_units_r=n_units_r,
+            penalty_l2=penalty_l2,
+            step_size=step_size,
+            n_iter=n_iter,
+            batch_size=batch_size,
+            val_split_prop=val_split_prop,
+            early_stopping=early_stopping,
+            patience=patience,
+            n_iter_min=n_iter_min,
+            n_iter_print=n_iter_print,
+            verbose=verbose,
+            seed=seed,
+            nonlin=nonlin,
+            avg_objective=avg_objective,
+        )
 
     else:
         params_prop, predict_fun_prop = None, None
@@ -278,26 +333,29 @@ def train_x_net(X, y, w, weight_strategy: int = None,
         if verbose > 0:
             print("Fitting tau_0")
         pseudo_outcome0 = mu_hat_1 - y[w == 0]
-        params_tau0, predict_fun_tau0 = train_output_net_only(X[w == 0], pseudo_outcome0,
-                                                              binary_y=False,
-                                                              n_layers_out=n_layers_out_t,
-                                                              n_units_out=n_units_out_t,
-                                                              n_layers_r=n_layers_r_t,
-                                                              n_units_r=n_units_r_t,
-                                                              penalty_l2=penalty_l2_t,
-                                                              step_size=step_size_t,
-                                                              n_iter=n_iter,
-                                                              batch_size=batch_size,
-                                                              val_split_prop=val_split_prop,
-                                                              early_stopping=early_stopping,
-                                                              patience=patience,
-                                                              n_iter_min=n_iter_min,
-                                                              n_iter_print=n_iter_print,
-                                                              verbose=verbose,
-                                                              seed=seed,
-                                                              return_val_loss=return_val_loss,
-                                                              nonlin=nonlin,
-                                                              avg_objective=avg_objective)
+        params_tau0, predict_fun_tau0 = train_output_net_only(
+            X[w == 0],
+            pseudo_outcome0,
+            binary_y=False,
+            n_layers_out=n_layers_out_t,
+            n_units_out=n_units_out_t,
+            n_layers_r=n_layers_r_t,
+            n_units_r=n_units_r_t,
+            penalty_l2=penalty_l2_t,
+            step_size=step_size_t,
+            n_iter=n_iter,
+            batch_size=batch_size,
+            val_split_prop=val_split_prop,
+            early_stopping=early_stopping,
+            patience=patience,
+            n_iter_min=n_iter_min,
+            n_iter_print=n_iter_print,
+            verbose=verbose,
+            seed=seed,
+            return_val_loss=return_val_loss,
+            nonlin=nonlin,
+            avg_objective=avg_objective,
+        )
     else:
         params_tau0, predict_fun_tau0 = None, None
 
@@ -306,26 +364,29 @@ def train_x_net(X, y, w, weight_strategy: int = None,
         if verbose > 0:
             print("Fitting tau_1")
         pseudo_outcome1 = y[w == 1] - mu_hat_0
-        params_tau1, predict_fun_tau1 = train_output_net_only(X[w == 1], pseudo_outcome1,
-                                                              binary_y=False,
-                                                              n_layers_out=n_layers_out_t,
-                                                              n_units_out=n_units_out_t,
-                                                              n_layers_r=n_layers_r_t,
-                                                              n_units_r=n_units_r_t,
-                                                              penalty_l2=penalty_l2_t,
-                                                              step_size=step_size_t,
-                                                              n_iter=n_iter,
-                                                              batch_size=batch_size,
-                                                              val_split_prop=val_split_prop,
-                                                              early_stopping=early_stopping,
-                                                              patience=patience,
-                                                              n_iter_min=n_iter_min,
-                                                              n_iter_print=n_iter_print,
-                                                              verbose=verbose,
-                                                              seed=seed,
-                                                              return_val_loss=return_val_loss,
-                                                              nonlin=nonlin,
-                                                              avg_objective=avg_objective)
+        params_tau1, predict_fun_tau1 = train_output_net_only(
+            X[w == 1],
+            pseudo_outcome1,
+            binary_y=False,
+            n_layers_out=n_layers_out_t,
+            n_units_out=n_units_out_t,
+            n_layers_r=n_layers_r_t,
+            n_units_r=n_units_r_t,
+            penalty_l2=penalty_l2_t,
+            step_size=step_size_t,
+            n_iter=n_iter,
+            batch_size=batch_size,
+            val_split_prop=val_split_prop,
+            early_stopping=early_stopping,
+            patience=patience,
+            n_iter_min=n_iter_min,
+            n_iter_print=n_iter_print,
+            verbose=verbose,
+            seed=seed,
+            return_val_loss=return_val_loss,
+            nonlin=nonlin,
+            avg_objective=avg_objective,
+        )
 
     else:
         params_tau1, predict_fun_tau1 = None, None
@@ -336,14 +397,19 @@ def train_x_net(X, y, w, weight_strategy: int = None,
     return params, predict_funs
 
 
-def predict_x_net(X, trained_params, predict_funs,
-                  return_po: bool = False, return_prop: bool = False,
-                  weight_strategy: int = None):
+def predict_x_net(
+    X: np.ndarray,
+    trained_params: dict,
+    predict_funs: list,
+    return_po: bool = False,
+    return_prop: bool = False,
+    weight_strategy: Optional[int] = None,
+) -> np.ndarray:
     if return_po:
-        raise NotImplementedError('TwoStepNets have no Potential outcome predictors.')
+        raise NotImplementedError("TwoStepNets have no Potential outcome predictors.")
 
     if return_prop:
-        raise NotImplementedError('TwoStepNets have no Propensity predictors.')
+        raise NotImplementedError("TwoStepNets have no Propensity predictors.")
 
     params_tau0, params_tau1, params_prop = trained_params
     predict_fun_tau0, predict_fun_tau1, predict_fun_prop = predict_funs
@@ -370,4 +436,4 @@ def predict_x_net(X, trained_params, predict_funs,
     elif weight_strategy == 1:
         weight = 1
 
-    return weight * tau0_pred + (1-weight) * tau1_pred
+    return weight * tau0_pred + (1 - weight) * tau1_pred

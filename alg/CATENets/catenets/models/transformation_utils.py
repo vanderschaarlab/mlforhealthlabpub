@@ -2,16 +2,20 @@
 Author: Alicia Curth
 Utils for transformations
 """
-import numpy as onp
+from typing import Any, Optional
 
-PW_TRANSFORMATION = 'PW'
-DR_TRANSFORMATION = 'DR'
-RA_TRANSFORMATION = 'RA'
+import numpy as np
+
+PW_TRANSFORMATION = "PW"
+DR_TRANSFORMATION = "DR"
+RA_TRANSFORMATION = "RA"
 
 ALL_TRANSFORMATIONS = [PW_TRANSFORMATION, DR_TRANSFORMATION, RA_TRANSFORMATION]
 
 
-def aipw_te_transformation(y, w, p, mu_0, mu_1):
+def aipw_te_transformation(
+    y: np.ndarray, w: np.ndarray, p: np.ndarray, mu_0: np.ndarray, mu_1: np.ndarray
+) -> np.ndarray:
     """
     Transforms data to efficient influence function pseudo-outcome for CATE estimation
 
@@ -35,14 +39,20 @@ def aipw_te_transformation(y, w, p, mu_0, mu_1):
     """
     if p is None:
         # assume equal
-        p = onp.full(len(y), 0.5)
+        p = np.full(len(y), 0.5)
 
     w_1 = w / p
     w_0 = (1 - w) / (1 - p)
     return (w_1 - w_0) * y + ((1 - w_1) * mu_1 - (1 - w_0) * mu_0)
 
 
-def ht_te_transformation(y, w, p, mu_0=None, mu_1=None):
+def ht_te_transformation(
+    y: np.ndarray,
+    w: np.ndarray,
+    p: np.ndarray,
+    mu_0: Optional[np.ndarray] = None,
+    mu_1: Optional[np.ndarray] = None,
+) -> np.ndarray:
     """
     Transform data to Horvitz-Thompson transformation for CATE
 
@@ -66,11 +76,13 @@ def ht_te_transformation(y, w, p, mu_0=None, mu_1=None):
     """
     if p is None:
         # assume equal propensities
-        p = onp.full(len(y), 0.5)
+        p = np.full(len(y), 0.5)
     return (w / p - (1 - w) / (1 - p)) * y
 
 
-def ra_te_transformation(y, w, p, mu_0, mu_1):
+def ra_te_transformation(
+    y: np.ndarray, w: np.ndarray, p: np.ndarray, mu_0: np.ndarray, mu_1: np.ndarray
+) -> np.ndarray:
     """
     Transform data to regression adjustment for CATE
 
@@ -92,20 +104,24 @@ def ra_te_transformation(y, w, p, mu_0, mu_1):
     res: array-like of shape (n_samples,)
         Regression adjusted transformation
     """
-    return w * (y - mu_0) + (1-w) * (mu_1 - y)
+    return w * (y - mu_0) + (1 - w) * (mu_1 - y)
 
 
-TRANSFORMATION_DICT = {PW_TRANSFORMATION: ht_te_transformation,
-                       RA_TRANSFORMATION: ra_te_transformation,
-                       DR_TRANSFORMATION: aipw_te_transformation}
+TRANSFORMATION_DICT = {
+    PW_TRANSFORMATION: ht_te_transformation,
+    RA_TRANSFORMATION: ra_te_transformation,
+    DR_TRANSFORMATION: aipw_te_transformation,
+}
 
 
-def _get_transformation_function(transformation_name):
+def _get_transformation_function(transformation_name: str) -> Any:
     """
     Get transformation function associated with a name
     """
     if transformation_name not in ALL_TRANSFORMATIONS:
-        raise ValueError('Parameter first stage should be in '
-                         'catenets.models.transformations.ALL_TRANSFORMATIONS.'
-                         ' You passed {}'.format(transformation_name))
+        raise ValueError(
+            "Parameter first stage should be in "
+            "catenets.models.transformations.ALL_TRANSFORMATIONS."
+            " You passed {}".format(transformation_name)
+        )
     return TRANSFORMATION_DICT[transformation_name]

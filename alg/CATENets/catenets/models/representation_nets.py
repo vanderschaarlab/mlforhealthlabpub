@@ -10,6 +10,7 @@ import numpy as onp
 from jax import grad, jit, random
 from jax.experimental import optimizers
 
+import catenets.logger as log
 from catenets.models.base import BaseCATENet, OutputHead, ReprBlock
 from catenets.models.constants import (
     DEFAULT_AVG_OBJECTIVE,
@@ -70,8 +71,6 @@ class SNet1(BaseCATENet):
         Number of iterations to wait before early stopping after decrease in validation loss
     n_iter_min: int
         Minimum number of iterations to go through before starting early stopping
-    verbose: int, default 1
-        Whether to print notifications
     n_iter_print: int
         Number of iterations after which to print updates
     seed: int
@@ -104,7 +103,6 @@ class SNet1(BaseCATENet):
         early_stopping: bool = True,
         patience: int = DEFAULT_PATIENCE,
         n_iter_min: int = DEFAULT_N_ITER_MIN,
-        verbose: int = 1,
         n_iter_print: int = DEFAULT_N_ITER_PRINT,
         seed: int = DEFAULT_SEED,
         reg_diff: bool = False,
@@ -132,7 +130,6 @@ class SNet1(BaseCATENet):
         self.step_size = step_size
         self.n_iter = n_iter
         self.batch_size = batch_size
-        self.verbose = verbose
         self.n_iter_print = n_iter_print
         self.seed = seed
         self.val_split_prop = val_split_prop
@@ -165,7 +162,6 @@ class TARNet(SNet1):
         early_stopping: bool = True,
         patience: int = DEFAULT_PATIENCE,
         n_iter_min: int = DEFAULT_N_ITER_MIN,
-        verbose: int = 1,
         n_iter_print: int = DEFAULT_N_ITER_PRINT,
         seed: int = DEFAULT_SEED,
         reg_diff: bool = False,
@@ -187,7 +183,6 @@ class TARNet(SNet1):
             early_stopping=early_stopping,
             patience=patience,
             n_iter_min=n_iter_min,
-            verbose=verbose,
             n_iter_print=n_iter_print,
             seed=seed,
             reg_diff=reg_diff,
@@ -231,8 +226,6 @@ class SNet2(BaseCATENet):
         Number of iterations to wait before early stopping after decrease in validation loss
     n_iter_min: int
         Minimum number of iterations to go through before starting early stopping
-    verbose: int, default 1
-        Whether to print notifications
     n_iter_print: int
         Number of iterations after which to print updates
     seed: int
@@ -263,7 +256,6 @@ class SNet2(BaseCATENet):
         early_stopping: bool = True,
         patience: int = DEFAULT_PATIENCE,
         n_iter_min: int = DEFAULT_N_ITER_MIN,
-        verbose: int = 1,
         n_iter_print: int = DEFAULT_N_ITER_PRINT,
         seed: int = DEFAULT_SEED,
         reg_diff: bool = False,
@@ -292,7 +284,6 @@ class SNet2(BaseCATENet):
         self.same_init = same_init
 
         self.seed = seed
-        self.verbose = verbose
         self.n_iter_print = n_iter_print
 
     def _get_train_function(self) -> Callable:
@@ -367,7 +358,6 @@ def train_snet1(
     early_stopping: bool = True,
     patience: int = DEFAULT_PATIENCE,
     n_iter_min: int = DEFAULT_N_ITER_MIN,
-    verbose: int = 1,
     n_iter_print: int = DEFAULT_N_ITER_PRINT,
     seed: int = DEFAULT_SEED,
     return_val_loss: bool = False,
@@ -530,7 +520,7 @@ def train_snet1(
                 i * n_batches + b, opt_state, next_batch, penalty_l2, penalty_disc
             )
 
-        if (verbose > 0 and i % n_iter_print == 0) or early_stopping:
+        if (i % n_iter_print == 0) or early_stopping:
             params_curr = get_params(opt_state)
             l_curr = loss_snet1(
                 params_curr,
@@ -540,8 +530,8 @@ def train_snet1(
                 penalty_diff,
             )
 
-        if verbose > 0 and i % n_iter_print == 0:
-            print(f"Epoch: {i}, current {val_string} loss {l_curr}")
+        if i % n_iter_print == 0:
+            log.info(f"Epoch: {i}, current {val_string} loss {l_curr}")
 
         if early_stopping:
             if l_curr < l_best:
@@ -591,7 +581,6 @@ def train_snet2(
     early_stopping: bool = True,
     patience: int = DEFAULT_PATIENCE,
     n_iter_min: int = DEFAULT_N_ITER_MIN,
-    verbose: int = 1,
     n_iter_print: int = DEFAULT_N_ITER_PRINT,
     seed: int = DEFAULT_SEED,
     return_val_loss: bool = False,
@@ -765,14 +754,14 @@ def train_snet2(
                 i * n_batches + b, opt_state, next_batch, penalty_l2, penalty_diff
             )
 
-        if (verbose > 0 and i % n_iter_print == 0) or early_stopping:
+        if (i % n_iter_print == 0) or early_stopping:
             params_curr = get_params(opt_state)
             l_curr = loss_snet2(
                 params_curr, (X_val, y_val, w_val), penalty_l2, penalty_diff
             )
 
-        if verbose > 0 and i % n_iter_print == 0:
-            print(f"Epoch: {i}, current {val_string} loss {l_curr}")
+        if i % n_iter_print == 0:
+            log.info(f"Epoch: {i}, current {val_string} loss {l_curr}")
 
         if early_stopping and ((i + 1) * n_batches > n_iter_min):
             # check if loss updated

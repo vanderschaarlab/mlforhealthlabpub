@@ -6,6 +6,7 @@ from typing import Any, Callable, Optional
 
 import numpy as np
 
+import catenets.logger as log
 from catenets.models.base import BaseCATENet, train_output_net_only
 from catenets.models.constants import (
     DEFAULT_AVG_OBJECTIVE,
@@ -84,8 +85,6 @@ class XNet(BaseCATENet):
         Number of iterations to wait before early stopping after decrease in validation loss
     n_iter_min: int
         Minimum number of iterations to go through before starting early stopping
-    verbose: int, default 1
-        Whether to print notifications
     n_iter_print: int
         Number of iterations after which to print updates
     seed: int
@@ -116,7 +115,6 @@ class XNet(BaseCATENet):
         val_split_prop: float = DEFAULT_VAL_SPLIT,
         early_stopping: bool = True,
         patience: int = DEFAULT_PATIENCE,
-        verbose: int = 1,
         n_iter_print: int = DEFAULT_N_ITER_PRINT,
         seed: int = DEFAULT_SEED,
         nonlin: str = DEFAULT_NONLIN,
@@ -143,7 +141,6 @@ class XNet(BaseCATENet):
         self.step_size_t = step_size_t
         self.n_iter = n_iter
         self.batch_size = batch_size
-        self.verbose = verbose
         self.n_iter_print = n_iter_print
         self.seed = seed
         self.val_split_prop = val_split_prop
@@ -214,7 +211,6 @@ def train_x_net(
     val_split_prop: float = DEFAULT_VAL_SPLIT,
     early_stopping: bool = True,
     patience: int = DEFAULT_PATIENCE,
-    verbose: int = 1,
     n_iter_print: int = DEFAULT_N_ITER_PRINT,
     seed: int = DEFAULT_SEED,
     nonlin: str = DEFAULT_NONLIN,
@@ -234,12 +230,10 @@ def train_x_net(
         raise ValueError("XNet only implements weight_strategy in [0, 1, -1, None]")
 
     # first stage: get estimates of PO regression
-    if verbose > 0:
-        print("Training first stage")
+    log.debug("Training first stage")
 
     if not weight_strategy == 1:
-        if verbose > 0:
-            print("Training PO_0 Net")
+        log.debug("Training PO_0 Net")
         params_0, predict_fun_0 = train_output_net_only(
             X[w == 0],
             y[w == 0],
@@ -257,7 +251,6 @@ def train_x_net(
             patience=patience,
             n_iter_min=n_iter_min,
             n_iter_print=n_iter_print,
-            verbose=verbose,
             seed=seed,
             nonlin=nonlin,
             avg_objective=avg_objective,
@@ -267,8 +260,7 @@ def train_x_net(
         mu_hat_0 = None
 
     if not weight_strategy == 0:
-        if verbose > 0:
-            print("Training PO_1 Net")
+        log.debug("Training PO_1 Net")
         params_1, predict_fun_1 = train_output_net_only(
             X[w == 1],
             y[w == 1],
@@ -286,7 +278,6 @@ def train_x_net(
             patience=patience,
             n_iter_min=n_iter_min,
             n_iter_print=n_iter_print,
-            verbose=verbose,
             seed=seed,
             nonlin=nonlin,
             avg_objective=avg_objective,
@@ -297,8 +288,7 @@ def train_x_net(
 
     if weight_strategy is None or weight_strategy == -1:
         # also fit propensity estimator
-        if verbose > 0:
-            print("Training propensity net")
+        log.debug("Training propensity net")
         params_prop, predict_fun_prop = train_output_net_only(
             X,
             w,
@@ -316,7 +306,6 @@ def train_x_net(
             patience=patience,
             n_iter_min=n_iter_min,
             n_iter_print=n_iter_print,
-            verbose=verbose,
             seed=seed,
             nonlin=nonlin,
             avg_objective=avg_objective,
@@ -326,12 +315,10 @@ def train_x_net(
         params_prop, predict_fun_prop = None, None
 
     # second stage
-    if verbose > 0:
-        print("Training second stage")
+    log.debug("Training second stage")
     if not weight_strategy == 0:
         # fit tau_0
-        if verbose > 0:
-            print("Fitting tau_0")
+        log.debug("Fitting tau_0")
         pseudo_outcome0 = mu_hat_1 - y[w == 0]
         params_tau0, predict_fun_tau0 = train_output_net_only(
             X[w == 0],
@@ -350,7 +337,6 @@ def train_x_net(
             patience=patience,
             n_iter_min=n_iter_min,
             n_iter_print=n_iter_print,
-            verbose=verbose,
             seed=seed,
             return_val_loss=return_val_loss,
             nonlin=nonlin,
@@ -361,8 +347,7 @@ def train_x_net(
 
     if not weight_strategy == 1:
         # fit tau_1
-        if verbose > 0:
-            print("Fitting tau_1")
+        log.debug("Fitting tau_1")
         pseudo_outcome1 = y[w == 1] - mu_hat_0
         params_tau1, predict_fun_tau1 = train_output_net_only(
             X[w == 1],
@@ -381,7 +366,6 @@ def train_x_net(
             patience=patience,
             n_iter_min=n_iter_min,
             n_iter_print=n_iter_print,
-            verbose=verbose,
             seed=seed,
             return_val_loss=return_val_loss,
             nonlin=nonlin,

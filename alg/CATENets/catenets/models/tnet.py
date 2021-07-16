@@ -9,6 +9,7 @@ import numpy as onp
 from jax import grad, jit, random
 from jax.experimental import optimizers
 
+import catenets.logger as log
 from catenets.models.base import BaseCATENet, OutputHead, train_output_net_only
 from catenets.models.constants import (
     DEFAULT_AVG_OBJECTIVE,
@@ -68,8 +69,6 @@ class TNet(BaseCATENet):
         Number of iterations to wait before early stopping after decrease in validation loss
     n_iter_min: int
         Minimum number of iterations to go through before starting early stopping
-    verbose: int, default 1
-        Whether to print notifications
     n_iter_print: int
         Number of iterations after which to print updates
     seed: int
@@ -99,7 +98,6 @@ class TNet(BaseCATENet):
         early_stopping: bool = True,
         patience: int = DEFAULT_PATIENCE,
         n_iter_min: int = DEFAULT_N_ITER_MIN,
-        verbose: int = 1,
         n_iter_print: int = DEFAULT_N_ITER_PRINT,
         seed: int = DEFAULT_SEED,
         train_separate: bool = True,
@@ -120,7 +118,6 @@ class TNet(BaseCATENet):
         self.patience = patience
         self.n_iter_min = n_iter_min
         self.n_iter_print = n_iter_print
-        self.verbose = verbose
         self.seed = seed
         self.train_separate = train_separate
         self.penalty_diff = penalty_diff
@@ -150,7 +147,6 @@ def train_tnet(
     early_stopping: bool = True,
     patience: int = DEFAULT_PATIENCE,
     n_iter_min: int = DEFAULT_N_ITER_MIN,
-    verbose: int = 1,
     n_iter_print: int = DEFAULT_N_ITER_PRINT,
     seed: int = DEFAULT_SEED,
     return_val_loss: bool = False,
@@ -165,8 +161,7 @@ def train_tnet(
 
     if train_separate:
         # train two heads completely independently
-        if verbose > 0:
-            print("Training PO_0 Net")
+        log.debug("Training PO_0 Net")
         out_0 = train_output_net_only(
             X[w == 0],
             y[w == 0],
@@ -184,14 +179,12 @@ def train_tnet(
             patience=patience,
             n_iter_min=n_iter_min,
             n_iter_print=n_iter_print,
-            verbose=verbose,
             seed=seed,
             return_val_loss=return_val_loss,
             nonlin=nonlin,
             avg_objective=avg_objective,
         )
-        if verbose > 0:
-            print("Training PO_1 Net")
+        log.debug("Training PO_1 Net")
         out_1 = train_output_net_only(
             X[w == 1],
             y[w == 1],
@@ -209,7 +202,6 @@ def train_tnet(
             patience=patience,
             n_iter_min=n_iter_min,
             n_iter_print=n_iter_print,
-            verbose=verbose,
             seed=seed,
             return_val_loss=return_val_loss,
             nonlin=nonlin,
@@ -243,7 +235,6 @@ def train_tnet(
             patience=patience,
             n_iter_min=n_iter_min,
             n_iter_print=n_iter_print,
-            verbose=verbose,
             seed=seed,
             return_val_loss=return_val_loss,
             penalty_diff=penalty_diff,
@@ -295,7 +286,6 @@ def _train_tnet_jointly(
     early_stopping: bool = True,
     patience: int = DEFAULT_PATIENCE,
     n_iter_min: int = DEFAULT_N_ITER_MIN,
-    verbose: int = 1,
     n_iter_print: int = DEFAULT_N_ITER_PRINT,
     seed: int = DEFAULT_SEED,
     return_val_loss: bool = False,
@@ -422,14 +412,14 @@ def _train_tnet_jointly(
                 i * n_batches + b, opt_state, next_batch, penalty_l2, penalty_diff
             )
 
-        if (verbose > 0 and i % n_iter_print == 0) or early_stopping:
+        if (i % n_iter_print == 0) or early_stopping:
             params_curr = get_params(opt_state)
             l_curr = loss_tnet(
                 params_curr, (X_val, y_val, w_val), penalty_l2, penalty_diff
             )
 
-        if verbose > 0 and i % n_iter_print == 0:
-            print(f"Epoch: {i}, current {val_string} loss {l_curr}")
+        if i % n_iter_print == 0:
+            log.debug(f"Epoch: {i}, current {val_string} loss {l_curr}")
 
         if early_stopping and ((i + 1) * n_batches > n_iter_min):
             if l_curr < l_best:

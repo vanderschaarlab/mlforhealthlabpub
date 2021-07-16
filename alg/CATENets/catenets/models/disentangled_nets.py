@@ -10,6 +10,7 @@ import numpy as onp
 from jax import grad, jit, random
 from jax.experimental import optimizers
 
+import catenets.logger as log
 from catenets.models.base import BaseCATENet, OutputHead, ReprBlock
 from catenets.models.constants import (
     DEFAULT_AVG_OBJECTIVE,
@@ -88,8 +89,6 @@ class SNet3(BaseCATENet):
         Number of iterations to wait before early stopping after decrease in validation loss
     n_iter_min: int
         Minimum number of iterations to go through before starting early stopping
-    verbose: int, default 1
-        Whether to print notifications
     n_iter_print: int
         Number of iterations after which to print updates
     seed: int
@@ -125,7 +124,6 @@ class SNet3(BaseCATENet):
         early_stopping: bool = True,
         patience: int = DEFAULT_PATIENCE,
         n_iter_min: int = DEFAULT_N_ITER_MIN,
-        verbose: int = 1,
         n_iter_print: int = DEFAULT_N_ITER_PRINT,
         seed: int = DEFAULT_SEED,
         nonlin: str = DEFAULT_NONLIN,
@@ -158,7 +156,6 @@ class SNet3(BaseCATENet):
         self.n_iter_min = n_iter_min
 
         self.seed = seed
-        self.verbose = verbose
         self.n_iter_print = n_iter_print
 
     def _get_predict_function(self) -> Callable:
@@ -189,7 +186,6 @@ def train_snet3(
     early_stopping: bool = True,
     n_iter_min: int = DEFAULT_N_ITER_MIN,
     patience: int = DEFAULT_PATIENCE,
-    verbose: int = 1,
     n_iter_print: int = DEFAULT_N_ITER_PRINT,
     seed: int = DEFAULT_SEED,
     return_val_loss: bool = False,
@@ -431,7 +427,7 @@ def train_snet3(
                 penalty_disc,
             )
 
-        if (verbose > 0 and i % n_iter_print == 0) or early_stopping:
+        if (i % n_iter_print == 0) or early_stopping:
             params_curr = get_params(opt_state)
             l_curr = loss_snet3(
                 params_curr,
@@ -441,8 +437,8 @@ def train_snet3(
                 penalty_disc,
             )
 
-        if verbose > 0 and i % n_iter_print == 0:
-            print(f"Epoch: {i}, current {val_string} loss {l_curr}")
+        if i % n_iter_print == 0:
+            log.info(f"Epoch: {i}, current {val_string} loss {l_curr}")
 
         if early_stopping and ((i + 1) * n_batches > n_iter_min):
             # check if loss updated

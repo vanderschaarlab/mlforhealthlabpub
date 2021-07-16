@@ -13,6 +13,7 @@ from jax.experimental.stax import Dense, Elu, Relu, Sigmoid
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.model_selection import ParameterGrid
 
+import catenets.logger as log
 from catenets.models.constants import (
     DEFAULT_BATCH_SIZE,
     DEFAULT_LAYERS_OUT,
@@ -226,16 +227,12 @@ class BaseCATENet(BaseEstimator, RegressorMixin, abc.ABC):
         param_settings: list = []
 
         for param_setting in param_grid:
-            if self.verbose > 0:
-                print(
-                    "Testing parameter setting: "
-                    + " ".join(
-                        [
-                            key + ": " + str(value)
-                            for key, value in param_setting.items()
-                        ]
-                    )
+            log.debug(
+                "Testing parameter setting: "
+                + " ".join(
+                    [key + ": " + str(value) for key, value in param_setting.items()]
                 )
+            )
             # replace params
             train_param_dict = {
                 key: (val if key not in param_setting.keys() else param_setting[key])
@@ -284,7 +281,6 @@ def train_output_net_only(
     early_stopping: bool = True,
     patience: int = DEFAULT_PATIENCE,
     n_iter_min: int = DEFAULT_N_ITER_MIN,
-    verbose: int = 1,
     n_iter_print: int = DEFAULT_N_ITER_PRINT,
     seed: int = DEFAULT_SEED,
     return_val_loss: bool = False,
@@ -396,12 +392,12 @@ def train_output_net_only(
             next_batch = X[idx_next, :], y[idx_next, :]
             opt_state = update(i * n_batches + b, opt_state, next_batch, penalty_l2)
 
-        if (verbose > 0 and i % n_iter_print == 0) or early_stopping:
+        if (n_iter_print == 0) or early_stopping:
             params_curr = get_params(opt_state)
             l_curr = loss(params_curr, (X_val, y_val), penalty_l2)
 
-        if verbose > 0 and i % n_iter_print == 0:
-            print(f"Epoch: {i}, current {val_string} loss: {l_curr}")
+        if i % n_iter_print == 0:
+            log.info(f"Epoch: {i}, current {val_string} loss: {l_curr}")
 
         if early_stopping and ((i + 1) * n_batches > n_iter_min):
             # check if loss updated

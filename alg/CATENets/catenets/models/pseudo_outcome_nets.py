@@ -9,6 +9,7 @@ import numpy as onp
 import pandas as pd
 from sklearn.model_selection import StratifiedKFold
 
+import catenets.logger as log
 from catenets.models.base import BaseCATENet, train_output_net_only
 from catenets.models.constants import (
     DEFAULT_AVG_OBJECTIVE,
@@ -126,8 +127,6 @@ class PseudoOutcomeNet(BaseCATENet):
         Number of iterations to wait before early stopping after decrease in validation loss
     n_iter_min: int
         Minimum number of iterations to go through before starting early stopping
-    verbose: int, default 1
-        Whether to print notifications
     n_iter_print: int
         Number of iterations after which to print updates
     seed: int
@@ -162,7 +161,6 @@ class PseudoOutcomeNet(BaseCATENet):
         val_split_prop: float = DEFAULT_VAL_SPLIT,
         early_stopping: bool = True,
         patience: int = DEFAULT_PATIENCE,
-        verbose: int = 1,
         n_iter_print: int = DEFAULT_N_ITER_PRINT,
         seed: int = DEFAULT_SEED,
         rescale_transformation: bool = False,
@@ -198,7 +196,6 @@ class PseudoOutcomeNet(BaseCATENet):
         self.step_size_t = step_size_t
         self.n_iter = n_iter
         self.batch_size = batch_size
-        self.verbose = verbose
         self.n_iter_print = n_iter_print
         self.seed = seed
         self.val_split_prop = val_split_prop
@@ -290,7 +287,6 @@ class DRNet(PseudoOutcomeNet):
         val_split_prop: float = DEFAULT_VAL_SPLIT,
         early_stopping: bool = True,
         patience: int = DEFAULT_PATIENCE,
-        verbose: int = 1,
         n_iter_print: int = DEFAULT_N_ITER_PRINT,
         seed: int = DEFAULT_SEED,
         rescale_transformation: bool = False,
@@ -323,7 +319,6 @@ class DRNet(PseudoOutcomeNet):
             val_split_prop=val_split_prop,
             early_stopping=early_stopping,
             patience=patience,
-            verbose=verbose,
             n_iter_print=n_iter_print,
             seed=seed,
             penalty_orthogonal=penalty_orthogonal,
@@ -361,7 +356,6 @@ class RANet(PseudoOutcomeNet):
         val_split_prop: float = DEFAULT_VAL_SPLIT,
         early_stopping: bool = True,
         patience: int = DEFAULT_PATIENCE,
-        verbose: int = 1,
         n_iter_print: int = DEFAULT_N_ITER_PRINT,
         seed: int = DEFAULT_SEED,
         rescale_transformation: bool = False,
@@ -394,7 +388,6 @@ class RANet(PseudoOutcomeNet):
             val_split_prop=val_split_prop,
             early_stopping=early_stopping,
             patience=patience,
-            verbose=verbose,
             n_iter_print=n_iter_print,
             seed=seed,
             penalty_orthogonal=penalty_orthogonal,
@@ -432,7 +425,6 @@ class PWNet(PseudoOutcomeNet):
         val_split_prop: float = DEFAULT_VAL_SPLIT,
         early_stopping: bool = True,
         patience: int = DEFAULT_PATIENCE,
-        verbose: int = 1,
         n_iter_print: int = DEFAULT_N_ITER_PRINT,
         seed: int = DEFAULT_SEED,
         rescale_transformation: bool = False,
@@ -465,7 +457,6 @@ class PWNet(PseudoOutcomeNet):
             val_split_prop=val_split_prop,
             early_stopping=early_stopping,
             patience=patience,
-            verbose=verbose,
             n_iter_print=n_iter_print,
             seed=seed,
             penalty_orthogonal=penalty_orthogonal,
@@ -504,7 +495,6 @@ def train_pseudooutcome_net(
     early_stopping: bool = True,
     patience: int = DEFAULT_PATIENCE,
     n_iter_min: int = DEFAULT_N_ITER_MIN,
-    verbose: int = 1,
     n_iter_print: int = DEFAULT_N_ITER_PRINT,
     seed: int = DEFAULT_SEED,
     rescale_transformation: bool = False,
@@ -535,14 +525,12 @@ def train_pseudooutcome_net(
     if p is None or transformation is not PW_TRANSFORMATION:
         if not cross_fit:
             if not data_split:
-                if verbose > 0:
-                    print("Training first stage with all data (no data splitting)")
+                log.debug("Training first stage with all data (no data splitting)")
                 # use all data for both
                 fit_mask = onp.ones(n, dtype=bool)
                 pred_mask = onp.ones(n, dtype=bool)
             else:
-                if verbose > 0:
-                    print("Training first stage with half of the data (data splitting)")
+                log.debug("Training first stage with half of the data (data splitting)")
                 # split data in half
                 fit_idx = onp.random.choice(n, int(onp.round(n / 2)))
                 fit_mask = onp.zeros(n, dtype=bool)
@@ -570,7 +558,6 @@ def train_pseudooutcome_net(
                 early_stopping=early_stopping,
                 patience=patience,
                 n_iter_min=n_iter_min,
-                verbose=verbose,
                 n_iter_print=n_iter_print,
                 seed=seed,
                 penalty_orthogonal=penalty_orthogonal,
@@ -587,8 +574,7 @@ def train_pseudooutcome_net(
                     p = p[pred_mask, :]
 
         else:
-            if verbose > 0:
-                print(f"Training first stage in {n_cf_folds} folds (cross-fitting)")
+            log.debug(f"Training first stage in {n_cf_folds} folds (cross-fitting)")
             # do cross fitting
             mu_0, mu_1, pi_hat = onp.zeros((n, 1)), onp.zeros((n, 1)), onp.zeros((n, 1))
             splitter = StratifiedKFold(
@@ -598,8 +584,7 @@ def train_pseudooutcome_net(
             fold_count = 1
             for train_idx, test_idx in splitter.split(X, w):
 
-                if verbose > 0:
-                    print(f"Training fold {fold_count}.")
+                log.debug(f"Training fold {fold_count}.")
                 fold_count = fold_count + 1
 
                 pred_mask = onp.zeros(n, dtype=bool)
@@ -630,7 +615,6 @@ def train_pseudooutcome_net(
                     early_stopping=early_stopping,
                     patience=patience,
                     n_iter_min=n_iter_min,
-                    verbose=verbose,
                     n_iter_print=n_iter_print,
                     seed=seed,
                     penalty_orthogonal=penalty_orthogonal,
@@ -640,8 +624,7 @@ def train_pseudooutcome_net(
                     transformation=transformation,
                 )
 
-    if verbose > 0:
-        print("Training second stage.")
+    log.debug("Training second stage.")
 
     if p is not None:
         # use known propensity score
@@ -679,7 +662,6 @@ def train_pseudooutcome_net(
             patience=patience,
             n_iter_min=n_iter_min,
             n_iter_print=n_iter_print,
-            verbose=verbose,
             seed=seed,
             return_val_loss=return_val_loss,
             nonlin=nonlin,
@@ -704,7 +686,6 @@ def train_pseudooutcome_net(
             patience=patience,
             n_iter_min=n_iter_min,
             n_iter_print=n_iter_print,
-            verbose=verbose,
             seed=seed,
             return_val_loss=return_val_loss,
             nonlin=nonlin,
@@ -731,7 +712,6 @@ def _train_and_predict_first_stage_t(
     early_stopping: bool = True,
     patience: int = DEFAULT_PATIENCE,
     n_iter_min: int = DEFAULT_N_ITER_MIN,
-    verbose: int = 1,
     n_iter_print: int = DEFAULT_N_ITER_PRINT,
     seed: int = DEFAULT_SEED,
     nonlin: str = DEFAULT_NONLIN,
@@ -747,8 +727,7 @@ def _train_and_predict_first_stage_t(
     X_pred = X[pred_mask, :]
 
     if transformation is not PW_TRANSFORMATION:
-        if verbose > 0:
-            print("Training PO_0 Net")
+        log.debug("Training PO_0 Net")
         params_0, predict_fun_0 = train_output_net_only(
             X_fit[w_fit == 0],
             y_fit[w_fit == 0],
@@ -766,15 +745,13 @@ def _train_and_predict_first_stage_t(
             patience=patience,
             n_iter_min=n_iter_min,
             n_iter_print=n_iter_print,
-            verbose=verbose,
             seed=seed,
             nonlin=nonlin,
             avg_objective=avg_objective,
         )
         mu_0 = predict_fun_0(params_0, X_pred)
 
-        if verbose > 0:
-            print("Training PO_1 Net")
+        log.debug("Training PO_1 Net")
         params_1, predict_fun_1 = train_output_net_only(
             X_fit[w_fit == 1],
             y_fit[w_fit == 1],
@@ -792,7 +769,6 @@ def _train_and_predict_first_stage_t(
             patience=patience,
             n_iter_min=n_iter_min,
             n_iter_print=n_iter_print,
-            verbose=verbose,
             seed=seed,
             nonlin=nonlin,
             avg_objective=avg_objective,
@@ -802,8 +778,7 @@ def _train_and_predict_first_stage_t(
         mu_0, mu_1 = onp.nan, onp.nan
 
     if transformation is not RA_TRANSFORMATION:
-        if verbose > 0:
-            print("Training propensity net")
+        log.debug("Training propensity net")
         params_prop, predict_fun_prop = train_output_net_only(
             X_fit,
             w_fit,
@@ -821,7 +796,6 @@ def _train_and_predict_first_stage_t(
             patience=patience,
             n_iter_min=n_iter_min,
             n_iter_print=n_iter_print,
-            verbose=verbose,
             seed=seed,
             nonlin=nonlin,
             avg_objective=avg_objective,
@@ -852,7 +826,6 @@ def _train_and_predict_first_stage_s1(
     early_stopping: bool = True,
     patience: int = DEFAULT_PATIENCE,
     n_iter_min: int = DEFAULT_N_ITER_MIN,
-    verbose: int = 1,
     n_iter_print: int = DEFAULT_N_ITER_PRINT,
     seed: int = DEFAULT_SEED,
     nonlin: str = DEFAULT_NONLIN,
@@ -864,8 +837,7 @@ def _train_and_predict_first_stage_s1(
     X_fit, y_fit, w_fit = X[fit_mask, :], y[fit_mask], w[fit_mask]
     X_pred = X[pred_mask, :]
 
-    if verbose > 0:
-        print("Training SNet1")
+    log.debug("Training SNet1")
     params_cfr, predict_funs_cfr = train_snet1(
         X_fit,
         y_fit,
@@ -884,7 +856,6 @@ def _train_and_predict_first_stage_s1(
         early_stopping=early_stopping,
         patience=patience,
         n_iter_min=n_iter_min,
-        verbose=verbose,
         n_iter_print=n_iter_print,
         seed=seed,
         nonlin=nonlin,
@@ -895,8 +866,7 @@ def _train_and_predict_first_stage_s1(
     )
 
     if transformation is not RA_TRANSFORMATION:
-        if verbose > 0:
-            print("Training propensity net")
+        log.debug("Training propensity net")
         params_prop, predict_fun_prop = train_output_net_only(
             X_fit,
             w_fit,
@@ -914,7 +884,6 @@ def _train_and_predict_first_stage_s1(
             patience=patience,
             n_iter_min=n_iter_min,
             n_iter_print=n_iter_print,
-            verbose=verbose,
             seed=seed,
             nonlin=nonlin,
             avg_objective=avg_objective,
@@ -945,7 +914,6 @@ def _train_and_predict_first_stage_s2(
     early_stopping: bool = True,
     patience: int = DEFAULT_PATIENCE,
     n_iter_min: int = DEFAULT_N_ITER_MIN,
-    verbose: int = 1,
     n_iter_print: int = DEFAULT_N_ITER_PRINT,
     seed: int = DEFAULT_SEED,
     nonlin: str = DEFAULT_NONLIN,
@@ -956,8 +924,7 @@ def _train_and_predict_first_stage_s2(
     X_fit, y_fit, w_fit = X[fit_mask, :], y[fit_mask], w[fit_mask]
     X_pred = X[pred_mask, :]
 
-    if verbose > 0:
-        print("Training SNet2")
+    log.debug("Training SNet2")
     params, predict_funs = train_snet2(
         X_fit,
         y_fit,
@@ -975,7 +942,6 @@ def _train_and_predict_first_stage_s2(
         early_stopping=early_stopping,
         patience=patience,
         n_iter_min=n_iter_min,
-        verbose=verbose,
         n_iter_print=n_iter_print,
         seed=seed,
         nonlin=nonlin,
@@ -1007,7 +973,6 @@ def _train_and_predict_first_stage_s3(
     early_stopping: bool = True,
     patience: int = DEFAULT_PATIENCE,
     n_iter_min: int = DEFAULT_N_ITER_MIN,
-    verbose: int = 1,
     n_iter_print: int = DEFAULT_N_ITER_PRINT,
     seed: int = DEFAULT_SEED,
     penalty_orthogonal: float = DEFAULT_PENALTY_ORTHOGONAL,
@@ -1021,8 +986,7 @@ def _train_and_predict_first_stage_s3(
     X_pred = X[pred_mask, :]
 
     # use snet3
-    if verbose > 0:
-        print("Training SNet3")
+    log.debug("Training SNet3")
     params, predict_funs = train_snet3(
         X_fit,
         y_fit,
@@ -1040,7 +1004,6 @@ def _train_and_predict_first_stage_s3(
         early_stopping=early_stopping,
         patience=patience,
         n_iter_min=n_iter_min,
-        verbose=verbose,
         n_iter_print=n_iter_print,
         seed=seed,
         penalty_orthogonal=penalty_orthogonal,
@@ -1074,7 +1037,6 @@ def _train_and_predict_first_stage_s4(
     early_stopping: bool = True,
     patience: int = DEFAULT_PATIENCE,
     n_iter_min: int = DEFAULT_N_ITER_MIN,
-    verbose: int = 1,
     n_iter_print: int = DEFAULT_N_ITER_PRINT,
     seed: int = DEFAULT_SEED,
     penalty_orthogonal: float = DEFAULT_PENALTY_ORTHOGONAL,
@@ -1087,8 +1049,7 @@ def _train_and_predict_first_stage_s4(
     X_fit, y_fit, w_fit = X[fit_mask, :], y[fit_mask], w[fit_mask]
     X_pred = X[pred_mask, :]
 
-    if verbose > 0:
-        print("Training SNet")
+    log.debug("Training SNet")
     params, predict_funs = train_snet(
         X_fit,
         y_fit,
@@ -1106,7 +1067,6 @@ def _train_and_predict_first_stage_s4(
         early_stopping=early_stopping,
         patience=patience,
         n_iter_min=n_iter_min,
-        verbose=verbose,
         n_iter_print=n_iter_print,
         seed=seed,
         penalty_orthogonal=penalty_orthogonal,
@@ -1141,7 +1101,6 @@ def _train_and_predict_first_stage(
     early_stopping: bool = True,
     patience: int = DEFAULT_PATIENCE,
     n_iter_min: int = DEFAULT_N_ITER_MIN,
-    verbose: int = 1,
     n_iter_print: int = DEFAULT_N_ITER_PRINT,
     seed: int = DEFAULT_SEED,
     penalty_orthogonal: float = DEFAULT_PENALTY_ORTHOGONAL,
@@ -1172,7 +1131,6 @@ def _train_and_predict_first_stage(
             patience=patience,
             n_iter_min=n_iter_min,
             n_iter_print=n_iter_print,
-            verbose=verbose,
             seed=seed,
             nonlin=nonlin,
             avg_objective=avg_objective,
@@ -1199,7 +1157,6 @@ def _train_and_predict_first_stage(
             early_stopping=early_stopping,
             patience=patience,
             n_iter_min=n_iter_min,
-            verbose=verbose,
             n_iter_print=n_iter_print,
             seed=seed,
             nonlin=nonlin,
@@ -1227,7 +1184,6 @@ def _train_and_predict_first_stage(
             early_stopping=early_stopping,
             patience=patience,
             n_iter_min=n_iter_min,
-            verbose=verbose,
             n_iter_print=n_iter_print,
             seed=seed,
             nonlin=nonlin,
@@ -1253,7 +1209,6 @@ def _train_and_predict_first_stage(
             early_stopping=early_stopping,
             patience=patience,
             n_iter_min=n_iter_min,
-            verbose=verbose,
             n_iter_print=n_iter_print,
             seed=seed,
             penalty_orthogonal=penalty_orthogonal,
@@ -1281,7 +1236,6 @@ def _train_and_predict_first_stage(
             early_stopping=early_stopping,
             patience=patience,
             n_iter_min=n_iter_min,
-            verbose=verbose,
             n_iter_print=n_iter_print,
             seed=seed,
             penalty_orthogonal=penalty_orthogonal,

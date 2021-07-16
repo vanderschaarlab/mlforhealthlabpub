@@ -5,8 +5,8 @@ on:
     branches: [main]
   pull_request:
     types: [opened, synchronize, reopened]
-  paths:
-    - "alg/CATENets"
+    paths:
+        - "alg/CATENets"
 
 defaults:
   run:

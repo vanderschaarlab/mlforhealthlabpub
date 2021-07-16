@@ -4,21 +4,19 @@ Script to run experiments on Johansson's IHDP dataset (retrieved via https://www
 """
 import csv
 import os
-from typing import Optional, Tuple, Union
-
-import numpy as onp
-from sklearn import clone
+from pathlib import Path
+from typing import Optional, Union
 
 import catenets.logger as log
+from catenets.datasets.dataset_ihdp import get_one_data_set, load_raw, prepare_ihdp_data
 from catenets.experiments.experiment_utils import eval_root_mse, get_model_set
 from catenets.models import PSEUDOOUT_NAME, PseudoOutcomeNet
 from catenets.models.transformation_utils import RA_TRANSFORMATION
+from sklearn import clone
 
 # Some constants
-DATA_DIR = "data/"
-IHDP_TRAIN_NAME = "ihdp_npci_1-100.train.npz"
-IHDP_TEST_NAME = "ihdp_npci_1-100.test.npz"
-RESULT_DIR = "results/ihdp/"
+DATA_DIR = Path("data/")
+RESULT_DIR = Path("results/ihdp/")
 SEP = "_"
 
 # Hyperparameters for experiments on IHDP
@@ -77,7 +75,7 @@ def do_ihdp_experiments(
         os.makedirs(RESULT_DIR)
 
     # get file to write in
-    out_file = open(RESULT_DIR + file_name + ".csv", "w", buffering=1)
+    out_file = open(RESULT_DIR / (file_name + ".csv"), "w", buffering=1)
     writer = csv.writer(out_file)
     header = [name + "_in" for name in models.keys()] + [
         name + "_out" for name in models.keys()
@@ -85,8 +83,7 @@ def do_ihdp_experiments(
     writer.writerow(header)
 
     # get data
-    data_train = load_data_npz(DATA_DIR + IHDP_TRAIN_NAME, get_po=True)
-    data_test = load_data_npz(DATA_DIR + IHDP_TEST_NAME, get_po=True)
+    data_train, data_test = load_raw(DATA_DIR)
 
     if isinstance(n_exp, int):
         experiment_loop = list(range(1, n_exp + 1))
@@ -125,91 +122,3 @@ def do_ihdp_experiments(
         writer.writerow(pehe_in + pehe_out)
 
     out_file.close()
-
-
-def prepare_ihdp_data(
-    data_train: dict, data_test: dict, rescale: bool = True, return_pos: bool = False
-) -> Tuple:
-    """Prepare data"""
-
-    X, y, w, mu0, mu1 = (
-        data_train["X"],
-        data_train["y"],
-        data_train["w"],
-        data_train["mu0"],
-        data_train["mu1"],
-    )
-
-    X_t, _, _, mu0_t, mu1_t = (
-        data_test["X"],
-        data_test["y"],
-        data_test["w"],
-        data_test["mu0"],
-        data_test["mu1"],
-    )
-
-    if rescale:
-        # rescale all outcomes to have similar scale of CATEs if sd_cate > 1
-        cate_in = mu0 - mu1
-        sd_cate = onp.sqrt(cate_in.var())
-
-        if sd_cate > 1:
-            # training data
-            error = y - w * mu1 - (1 - w) * mu0
-            mu0 = mu0 / sd_cate
-            mu1 = mu1 / sd_cate
-            y = w * mu1 + (1 - w) * mu0 + error
-
-            # test data
-            mu0_t = mu0_t / sd_cate
-            mu1_t = mu1_t / sd_cate
-
-    cate_true_in = mu1 - mu0
-    cate_true_out = mu1_t - mu0_t
-
-    if return_pos:
-        return X, y, w, cate_true_in, X_t, cate_true_out, mu0, mu1, mu0_t, mu1_t
-
-    return X, y, w, cate_true_in, X_t, cate_true_out
-
-
-# helper functions
-def load_data_npz(fname: str, get_po: bool = True) -> dict:
-    """Load data set (adapted from https://github.com/clinicalml/cfrnet)"""
-    if fname[-3:] == "npz":
-        data_in = onp.load(fname)
-        data = {"X": data_in["x"], "w": data_in["t"], "y": data_in["yf"]}
-        try:
-            data["ycf"] = data_in["ycf"]
-        except BaseException:
-            data["ycf"] = None
-    else:
-        raise ValueError("This loading function is only for npz files.")
-
-    if get_po:
-        data["mu0"] = data_in["mu0"]
-        data["mu1"] = data_in["mu1"]
-
-    data["HAVE_TRUTH"] = not data["ycf"] is None
-    data["dim"] = data["X"].shape[1]
-    data["n"] = data["X"].shape[0]
-
-    return data
-
-
-def get_one_data_set(D: dict, i_exp: int, get_po: bool = True) -> dict:
-    """Get data for one experiment. Adapted from https://github.com/clinicalml/cfrnet"""
-    D_exp = {}
-    D_exp["X"] = D["X"][:, :, i_exp - 1]
-    D_exp["w"] = D["w"][:, i_exp - 1 : i_exp]
-    D_exp["y"] = D["y"][:, i_exp - 1 : i_exp]
-    if D["HAVE_TRUTH"]:
-        D_exp["ycf"] = D["ycf"][:, i_exp - 1 : i_exp]
-    else:
-        D_exp["ycf"] = None
-
-    if get_po:
-        D_exp["mu0"] = D["mu0"][:, i_exp - 1 : i_exp]
-        D_exp["mu1"] = D["mu1"][:, i_exp - 1 : i_exp]
-
-    return D_exp

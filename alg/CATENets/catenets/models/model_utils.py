@@ -6,9 +6,8 @@ from typing import Any, Optional
 
 import jax.numpy as jnp
 import pandas as pd
-from sklearn.model_selection import train_test_split
-
 from catenets.models.constants import DEFAULT_SEED, DEFAULT_VAL_SPLIT
+from sklearn.model_selection import train_test_split
 
 TRAIN_STRING = "training"
 VALIDATION_STRING = "validation"
@@ -26,9 +25,7 @@ def check_shape_1d_data(y: jnp.ndarray) -> jnp.ndarray:
 
 def check_X_is_np(X: pd.DataFrame) -> jnp.ndarray:
     # function to make sure we are using arrays only
-    if isinstance(X, pd.DataFrame):
-        X = X.values
-    return X
+    return jnp.asarray(X)
 
 
 def make_val_split(
@@ -43,32 +40,33 @@ def make_val_split(
         # return original data
         if w is None:
             return X, y, X, y, TRAIN_STRING
-        else:
-            return X, y, w, X, y, w, TRAIN_STRING
+
+        return X, y, w, X, y, w, TRAIN_STRING
+
+    # make actual split
+    if w is None:
+        X_t, X_val, y_t, y_val = train_test_split(
+            X, y, test_size=val_split_prop, random_state=seed, shuffle=True
+        )
+        return X_t, y_t, X_val, y_val, VALIDATION_STRING
+
+    if stratify_w:
+        # split to stratify by group
+        X_t, X_val, y_t, y_val, w_t, w_val = train_test_split(
+            X,
+            y,
+            w,
+            test_size=val_split_prop,
+            random_state=seed,
+            stratify=w,
+            shuffle=True,
+        )
     else:
-        # make actual split
-        if w is None:
-            X_t, X_val, y_t, y_val = train_test_split(
-                X, y, test_size=val_split_prop, random_state=seed, shuffle=True
-            )
-            return X_t, y_t, X_val, y_val, VALIDATION_STRING
-        else:
-            if stratify_w:
-                # split to stratify by group
-                X_t, X_val, y_t, y_val, w_t, w_val = train_test_split(
-                    X,
-                    y,
-                    w,
-                    test_size=val_split_prop,
-                    random_state=seed,
-                    stratify=w,
-                    shuffle=True,
-                )
-            else:
-                X_t, X_val, y_t, y_val, w_t, w_val = train_test_split(
-                    X, y, w, test_size=val_split_prop, random_state=seed, shuffle=True
-                )
-            return X_t, y_t, w_t, X_val, y_val, w_val, VALIDATION_STRING
+        X_t, X_val, y_t, y_val, w_t, w_val = train_test_split(
+            X, y, w, test_size=val_split_prop, random_state=seed, shuffle=True
+        )
+
+    return X_t, y_t, w_t, X_val, y_val, w_val, VALIDATION_STRING
 
 
 def heads_l2_penalty(

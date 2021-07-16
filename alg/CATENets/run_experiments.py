@@ -16,7 +16,7 @@ log.add(sink=sys.stderr, level="DEBUG")
 def init_arg() -> Any:
     # arg parser if script is run from shell
     parser = argparse.ArgumentParser()
-    parser.add_argument("--experiment", default="simulation", type=str)
+    parser.add_argument("--experiment", default="ihdp", type=str)
     parser.add_argument("--setting", default=1, type=int)
     parser.add_argument("--models", default=None, type=str)
     parser.add_argument("--file_name", default="results", type=str)

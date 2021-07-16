@@ -5,6 +5,8 @@ on:
     branches: [main]
   pull_request:
     types: [opened, synchronize, reopened]
+  paths:
+    - "alg/CATENets"
 
 defaults:
   run:
@@ -29,6 +31,9 @@ jobs:
         run: pip install -r requirements_dev.txt
       - name: pre-commit validation
         run: pre-commit run --files alg/CATENets/*
+      - name: Security checks
+        run: |
+            bandit -r catenets/*
 
   Library:
     needs: [Linter]

@@ -10,4 +10,7 @@ def download_if_needed(path: Path, url: str) -> None:
     if path.exists():
         return
 
-    urllib.request.urlretrieve(url, path)
+    if url.lower().startswith("http"):
+        urllib.request.urlretrieve(url, path)  # nosec
+
+    raise ValueError(f"Invalid url provided {url}")

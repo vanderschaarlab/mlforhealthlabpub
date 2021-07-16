@@ -14,7 +14,11 @@ ALL_TRANSFORMATIONS = [PW_TRANSFORMATION, DR_TRANSFORMATION, RA_TRANSFORMATION]
 
 
 def aipw_te_transformation(
-    y: np.ndarray, w: np.ndarray, p: np.ndarray, mu_0: np.ndarray, mu_1: np.ndarray
+    y: np.ndarray,
+    w: np.ndarray,
+    p: Optional[np.ndarray],
+    mu_0: np.ndarray,
+    mu_1: np.ndarray,
 ) -> np.ndarray:
     """
     Transforms data to efficient influence function pseudo-outcome for CATE estimation
@@ -49,7 +53,7 @@ def aipw_te_transformation(
 def ht_te_transformation(
     y: np.ndarray,
     w: np.ndarray,
-    p: np.ndarray,
+    p: Optional[np.ndarray] = None,
     mu_0: Optional[np.ndarray] = None,
     mu_1: Optional[np.ndarray] = None,
 ) -> np.ndarray:
@@ -81,7 +85,11 @@ def ht_te_transformation(
 
 
 def ra_te_transformation(
-    y: np.ndarray, w: np.ndarray, p: np.ndarray, mu_0: np.ndarray, mu_1: np.ndarray
+    y: np.ndarray,
+    w: np.ndarray,
+    p: Optional[np.ndarray],
+    mu_0: np.ndarray,
+    mu_1: np.ndarray,
 ) -> np.ndarray:
     """
     Transform data to regression adjustment for CATE

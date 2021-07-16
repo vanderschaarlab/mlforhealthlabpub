@@ -113,14 +113,13 @@ class BaseCATENet(BaseEstimator, RegressorMixin, abc.ABC):
     Base CATENet class to serve as template for all other nets
     """
 
-    @abc.abstractmethod
     def score(
         self,
         X: jnp.ndarray,
         y: jnp.ndarray,
         sample_weight: Optional[jnp.ndarray] = None,
     ) -> float:
-        ...
+        pass
 
     @abc.abstractmethod
     def _get_train_function(self) -> Callable:

@@ -1,6 +1,7 @@
-jax
-jaxlib
-loguru
-numpy
-pandas
-scikit-learn
+jax>=0.1.77
+loguru>=0.5.3
+numpy>=1.19.2
+pandas>=1.1.2
+pytest>=6.2.4
+scikit_learn>=0.24.2
+scipy>=1.6.3

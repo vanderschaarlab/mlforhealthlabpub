@@ -4,4 +4,4 @@ numpy>=1.19.2
 pandas>=1.1.2
 pytest>=6.2.4
 scikit_learn>=0.24.2
-scipy>=1.6.3
+scipy>=1.2

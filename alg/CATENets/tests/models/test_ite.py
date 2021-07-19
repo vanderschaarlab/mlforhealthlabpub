@@ -31,9 +31,12 @@ def sqrt_PEHE(y: np.ndarray, hat_y: np.ndarray) -> float:
     return np.sqrt(np.mean(((y[:, 1] - y[:, 0]) - hat_y) ** 2))
 
 
-@pytest.mark.xfail
+models = list(ALL_MODELS.keys())
+models.remove("PseudoOutcomeNet_PW")
+
+
 @pytest.mark.parametrize("dataset, pehe_threshold", [("twins", 0.4), ("ihdp", 1.5)])
-@pytest.mark.parametrize("model_name", list(ALL_MODELS.keys()))
+@pytest.mark.parametrize("model_name", models)
 def test_model_sanity(dataset: str, pehe_threshold: float, model_name: str) -> None:
     model = deepcopy(ALL_MODELS[model_name])
 

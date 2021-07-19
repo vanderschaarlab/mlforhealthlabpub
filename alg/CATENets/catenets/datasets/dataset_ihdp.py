@@ -142,6 +142,7 @@ def load(
         X,
         w,
         y,
+        cate_true_in,
         X_t,
         np.asarray([mu0_t, mu1_t]).squeeze().T,
     )

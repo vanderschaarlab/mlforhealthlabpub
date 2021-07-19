@@ -40,7 +40,7 @@ models.remove("PseudoOutcomeNet_PW")
 def test_model_sanity(dataset: str, pehe_threshold: float, model_name: str) -> None:
     model = deepcopy(ALL_MODELS[model_name])
 
-    X_train, W_train, Y_train, X_test, Y_test = load(dataset)
+    X_train, W_train, Y_train, Y_train_full, X_test, Y_test = load(dataset)
 
     model.fit(X=X_train, y=Y_train, w=W_train)
 

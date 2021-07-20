@@ -152,9 +152,9 @@ class Ganite:
 
     def __init__(
         self,
-        X: pd.DataFrame,
-        Treatments: pd.DataFrame,
-        Y: pd.DataFrame,
+        X: np.ndarray,
+        Treatments: np.ndarray,
+        Y: np.ndarray,
         dim_hidden: int = 40,
         alpha: float = 1,
         beta: float = 1,
@@ -163,18 +163,19 @@ class Ganite:
         num_iterations: int = 5000,
         num_discr_iterations: int = 10,
     ) -> None:
-        X = pd.DataFrame(X)
-        Treatments = pd.Series(Treatments)
-        Y = pd.Series(Y)
+        X = np.asarray(X)
+        Treatments = np.asarray(Treatments)
+        Y = np.asarray(Y)
 
-        assert X.isna().any().sum() == 0, "X contains NaNs"
+        assert not np.isnan(np.sum(X)), "X contains NaNs"
         assert len(X) == len(Treatments), "Features/Treatments mismatch"
         assert len(X) == len(Y), "Features/Treatments mismatch"
         enable_reproducible_results()
 
         dim_in = X.shape[1]
-        self.original_treatments = np.sort(np.unique(Treatments.values))
+        self.original_treatments = np.sort(np.unique(Treatments))
         self.treatments = [0, 1]
+
         assert (
             len(self.original_treatments) == 2
         ), "Only two treatment categories supported"
@@ -229,9 +230,9 @@ class Ganite:
         Treatment: pd.DataFrame,
         Y: pd.DataFrame,
     ) -> "Ganite":
-        Train_X = torch.from_numpy(np.asarray(X)).float()
-        Train_T = torch.from_numpy(np.asarray(Treatment)).float().reshape([-1, 1])
-        Train_Y = torch.from_numpy(np.asarray(Y)).float().reshape([-1, 1])
+        Train_X = torch.from_numpy(X).float()
+        Train_T = torch.from_numpy(Treatment).float().reshape([-1, 1])
+        Train_Y = torch.from_numpy(Y).float().reshape([-1, 1])
         # Encode
         min_t_val = Train_T.min()
         Train_T = (Train_T > min_t_val).float()

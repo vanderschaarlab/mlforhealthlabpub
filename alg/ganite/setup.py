@@ -9,7 +9,7 @@ def read(fname: str) -> str:
 
 
 def find_version() -> str:
-    version_file = read("catenets/version.py")
+    version_file = read("ganite/version.py")
     version_re = r"__version__ = \"(?P<version>.+)\""
     version_raw = re.match(version_re, version_file)
 

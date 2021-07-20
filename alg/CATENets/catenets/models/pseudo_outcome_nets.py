@@ -717,7 +717,7 @@ def _train_and_predict_first_stage_t(
     nonlin: str = DEFAULT_NONLIN,
     avg_objective: bool = False,
     transformation: str = DR_TRANSFORMATION,
-) -> Tuple[onp.ndarray, onp.ndarray, onp.ndarray]:
+) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
     # train and predict first stage estimators using TNet
     if len(w.shape) > 1:
         w = w.reshape((len(w),))
@@ -831,7 +831,7 @@ def _train_and_predict_first_stage_s1(
     nonlin: str = DEFAULT_NONLIN,
     avg_objective: bool = False,
     transformation: str = DR_TRANSFORMATION,
-) -> Tuple[onp.ndarray, onp.ndarray, onp.ndarray]:
+) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
     # Train and predict first stage estimators using SNet1/ TARNet
     # split the data
     X_fit, y_fit, w_fit = X[fit_mask, :], y[fit_mask], w[fit_mask]
@@ -918,7 +918,7 @@ def _train_and_predict_first_stage_s2(
     seed: int = DEFAULT_SEED,
     nonlin: str = DEFAULT_NONLIN,
     avg_objective: bool = False,
-) -> Tuple[onp.ndarray, onp.ndarray, onp.ndarray]:
+) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
     # train and predict first stage estimator using SNet2/DragonNet
     # split the data
     X_fit, y_fit, w_fit = X[fit_mask, :], y[fit_mask], w[fit_mask]
@@ -979,7 +979,7 @@ def _train_and_predict_first_stage_s3(
     n_units_r_small: int = DEFAULT_UNITS_R_SMALL_S3,
     nonlin: str = DEFAULT_NONLIN,
     avg_objective: bool = False,
-) -> Tuple[onp.ndarray, onp.ndarray, onp.ndarray]:
+) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
     # Train and predict first stage estimator using SNet3/DR-CFR
     # split the data
     X_fit, y_fit, w_fit = X[fit_mask, :], y[fit_mask], w[fit_mask]
@@ -1043,7 +1043,7 @@ def _train_and_predict_first_stage_s4(
     n_units_r_small: int = DEFAULT_UNITS_R_SMALL_S,
     nonlin: str = DEFAULT_NONLIN,
     avg_objective: bool = False,
-) -> Tuple[onp.ndarray, onp.ndarray, onp.ndarray]:
+) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
     # train and predict first stage using SNet
     # split the data
     X_fit, y_fit, w_fit = X[fit_mask, :], y[fit_mask], w[fit_mask]
@@ -1108,7 +1108,7 @@ def _train_and_predict_first_stage(
     nonlin: str = DEFAULT_NONLIN,
     avg_objective: bool = False,
     transformation: str = DR_TRANSFORMATION,
-) -> Tuple[onp.ndarray, onp.ndarray, onp.ndarray]:
+) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
     if first_stage_strategy == T_STRATEGY:
         # simplest case: train three seperate heads
         mu_0, mu_1, pi_hat = _train_and_predict_first_stage_t(

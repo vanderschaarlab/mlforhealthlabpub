@@ -1,4 +1,4 @@
-name: Package release
+name: GANITE Package release
 
 on:
   release:

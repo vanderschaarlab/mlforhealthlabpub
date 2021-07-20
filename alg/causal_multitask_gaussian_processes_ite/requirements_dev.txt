@@ -1,0 +1,7 @@
+-r ./requirements.txt
+
+bandit
+black
+flake8
+pre-commit
+pytest

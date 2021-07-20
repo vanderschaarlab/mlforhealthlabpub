@@ -2,7 +2,7 @@
 import os
 import random
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Tuple
 
 import catenets.logger as log
 
@@ -105,9 +105,7 @@ def get_one_data_set(D: dict, i_exp: int, get_po: bool = True) -> dict:
     return D_exp
 
 
-def load(
-    data_path: Path, train_split: float = 0.8, downsample: Optional[int] = None
-) -> Tuple:
+def load(data_path: Path, train_split: float = 0.8) -> Tuple:
     """
     Download the dataset if needed.
     Load the dataset.

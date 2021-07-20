@@ -1,9 +1,26 @@
-# Twins data import (Jinsung Yoon, 10/11/2017)
+""".
+Reference: Jinsung Yoon, James Jordon, Mihaela van der Schaar,
+"GANITE: Estimation of Individualized Treatment Effects using Generative Adversarial Nets",
+International Conference on Learning Representations (ICLR), 2018.
 
+Paper link: https://openreview.net/forum?id=ByKWUeWA-
+
+Last updated Date: April 25th 2020
+Code author: Jinsung Yoon (jsyoon0823@gmail.com)
+
+-----------------------------
+
+data_loading.py
+
+Note: Load real-world individualized treatment effects estimation datasets
+
+(1) data_loading_twin: Load twins data.
+  - Reference: http://data.nber.org/data/linked-birth-infant-death-data-vital-statistics-data.html
+"""
 # stdlib
 import random
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import Tuple
 
 import catenets.logger as log
 
@@ -20,132 +37,74 @@ DATASET = "Twin_Data.csv.gz"
 URL = "https://bitbucket.org/mvdschaar/mlforhealthlabpub/raw/0b0190bcd38a76c405c805f1ca774971fcd85233/data/twins/Twin_Data.csv.gz"  # noqa: E501
 
 
-def preprocess(fn_csv: Path) -> List[np.ndarray]:
+def preprocess(fn_csv: Path, train_rate: float = 0.8) -> Tuple:
+    """Load twins data.
+
+    Args:
+      - train_rate: the ratio of training data
+
+    Returns:
+      - train_x: features in training data
+      - train_t: treatments in training data
+      - train_y: observed outcomes in training data
+      - train_potential_y: potential outcomes in training data
+      - test_x: features in testing data
+      - test_potential_y: potential outcomes in testing data
     """
-    Load the dataset and preprocess it.
-    Input:
-        fn_csv: Path to the input CSV to load
-    Outputs:
-        X: Feature Vector
-        T: Treatment Vector
-        Y: Observable Outcomes
-        Opt_Y: Potential Outcomes
-    """
-    # Data Input (11400 patients, 30 features, 2 potential outcomes)
-    Data = np.loadtxt(fn_csv, delimiter=",", skiprows=1)
 
-    # Features
-    X = Data[:, :30]
+    # Load original data (11400 patients, 30 features, 2 dimensional potential outcomes)
+    ori_data = np.loadtxt(fn_csv, delimiter=",", skiprows=1)
 
-    # Feature dimensions and patient numbers
-    Dim = len(X[0])
-    No = len(X)
+    # Define features
+    x = ori_data[:, :30]
+    no, dim = x.shape
 
-    # Labels
-    Opt_Y = Data[:, 30:]
+    # Define potential outcomes
+    potential_y = ori_data[:, 30:]
+    # Die within 1 year = 1, otherwise = 0
+    potential_y = np.array(potential_y < 9999, dtype=int)
 
-    for i in range(2):
-        idx = np.where(Opt_Y[:, i] > 365)
-        Opt_Y[idx, i] = 365
+    # Assign treatment
+    coef = np.random.uniform(-0.01, 0.01, size=[dim, 1])
+    prob_temp = expit(np.matmul(x, coef) + np.random.normal(0, 0.01, size=[no, 1]))
 
-    Opt_Y = 1 - (Opt_Y / 365.0)
+    prob_t = prob_temp / (2 * np.mean(prob_temp))
+    prob_t[prob_t > 1] = 1
 
-    # Patient Treatment Assignment
-    coef = 0 * np.random.uniform(-0.01, 0.01, size=[Dim, 1])
-    Temp = expit(np.matmul(X, coef) + np.random.normal(0, 0.01, size=[No, 1]))
-
-    Temp = Temp / (2 * np.mean(Temp))
-
-    Temp[Temp > 1] = 1
-
-    T = np.random.binomial(1, Temp, [No, 1])
-    T = T.reshape(
+    t = np.random.binomial(1, prob_t, [no, 1])
+    t = t.reshape(
         [
-            No,
+            no,
         ]
     )
 
-    # Observable outcomes
-    Y = np.zeros([No, 1])
-
-    # Output
-    Y = np.transpose(T) * Opt_Y[:, 1] + np.transpose(1 - T) * Opt_Y[:, 0]
-    Y = np.transpose(Y)
-    Y = np.reshape(
-        Y,
+    # Define observable outcomes
+    y = np.zeros([no, 1])
+    y = np.transpose(t) * potential_y[:, 1] + np.transpose(1 - t) * potential_y[:, 0]
+    y = np.reshape(
+        np.transpose(y),
         [
-            No,
+            no,
         ],
     )
 
-    return [
-        X,
-        T,
-        Y,
-        Opt_Y,
-    ]
+    # Train/test division
+    idx = np.random.permutation(no)
+    train_idx = idx[: int(train_rate * no)]
+    test_idx = idx[int(train_rate * no) :]
+
+    train_x = x[train_idx, :]
+    train_t = t[train_idx]
+    train_y = y[train_idx]
+    train_potential_y = potential_y[train_idx, :]
+
+    test_x = x[test_idx, :]
+    test_potential_y = potential_y[test_idx, :]
+
+    return train_x, train_t, train_y, train_potential_y, test_x, test_potential_y
 
 
-def train_test_split(
-    X: np.ndarray,
-    T: np.ndarray,
-    Y: np.ndarray,
-    Opt_Y: np.ndarray,
-    train_rate: float = 0.8,
-    downsample: Optional[int] = None,
-) -> Tuple:
-    """
-    Split the dataset for train and test.
-    Input:
-        X: Feature Vector
-        T: Treatment Vector
-        Y: Observable Outcomes
-        Opt_Y: Potential Outcomes
-        train_rate: Train/Test split
-    Outputs:
-        - Train_X, Test_X: Train and Test features
-        - Train_Y: Observable outcomes
-        - Train_T: Assigned treatment
-        - Opt_Train_Y, Test_Y: Potential outcomes.
-    """
-    No = len(X)
-
-    temp = np.random.permutation(No)
-    Train_No = int(train_rate * No)
-    train_idx = temp[:Train_No]
-    test_idx = temp[Train_No:No]
-
-    Train_X = X[train_idx, :]
-    Train_T = T[train_idx]
-    Train_Y = Y[train_idx]
-    Opt_Train_Y = Opt_Y[train_idx, :]
-
-    Test_X = X[test_idx, :]
-    Test_Y = Opt_Y[test_idx, :]
-
-    if downsample:
-        if len(Train_X) > downsample:
-            Train_X = Train_X[:downsample]
-            Train_Y = Train_Y[:downsample]
-            Train_T = Train_T[:downsample]
-            Opt_Train_Y = Opt_Train_Y[:downsample]
-        if len(Test_X) > downsample:
-            Test_X = Test_X[:downsample]
-            Test_Y = Test_Y[:downsample]
-
-    return (
-        Train_X,
-        Train_T,
-        Train_Y,
-        Opt_Train_Y,
-        Test_X,
-        Test_Y,
-    )
-
-
-def load(
-    data_path: Path, train_split: float = 0.8, downsample: Optional[int] = None
-) -> Tuple:
+def load(data_path: Path, train_split: float = 0.8) -> Tuple:
     """
     Download the dataset if needed.
     Load the dataset.
@@ -158,6 +117,4 @@ def load(
 
     log.debug(f"load dataset {csv}")
 
-    [X, T, Y, Opt_Y] = preprocess(csv)
-
-    return train_test_split(X, T, Y, Opt_Y, train_split, downsample)
+    return preprocess(csv, train_split)

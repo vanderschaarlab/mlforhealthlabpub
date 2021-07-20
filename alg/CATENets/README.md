@@ -1,11 +1,25 @@
 # CATENets - Conditional Average Treatment Effect Estimation Using Neural Networks
+
+[![Tests](https://github.com/vanderschaarlab/mlforhealthlabpub/actions/workflows/test_catenets.yml/badge.svg)](https://github.com/vanderschaarlab/mlforhealthlabpub/actions/workflows/test_catenets.yml)
+[![Slack](https://img.shields.io/badge/chat-on%20slack-7A5979.svg)](https://vanderschaarlab.slack.com/messages/general)
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://github.com/vanderschaarlab/mlforhealthlabpub/blob/main/LICENSE.md)
+
+
 Code Author: Alicia Curth (amc253@cam.ac.uk)
 
 This repo contains Jax-based, sklearn-style implementations of Neural Network-based Conditional Average Treatment Effect (CATE) Estimators, which were used in the AISTATS 2021 paper 'Nonparametric Estimation of Heterogeneous Treatment Effects: From Theory to Learning Algorithms' (https://arxiv.org/abs/2101.10943).
 
 We implement the SNet-class we introduce in our AISTATS paper, and re-implement a number of NN-based algorithms from existing literature (Shalit et al (2017), Shi et al (2019), Hassanpour & Greiner (2020)). We also provide NN-based instantiations of a number of so-called meta-learners for CATE estimation, including two-step pseudo-outcome regression estimators (the DR-learner (Kennedy, 2020) and single-robust propensity-weighted (PW) and regression-adjusted (RA) learners), Nie & Wager (2017)'s R-learner and Kuenzel et al (2019)'s X-learner.
 
-### Interface
+### Installation
+
+```bash
+$ pip install catenets
+```
+
+
+
+### Usage
 All implemented learning algorithms (``TNet, SNet, SNet1, SNet2, SNet3, DRNet, RANet, PWNet, RNet, XNet``) come with a sklearn-style wrapper, implementing a ``.fit(X, y, w)`` and a ``.predict(X)`` method, where predict returns CATE by default. All hyperparameters are documented in detail in the respective files in the .models folder.
 
 Example usage:

@@ -2,14 +2,11 @@
 Author: Alicia Curth
 Implements a T-Net: T-learner for CATE based on a dense NN
 """
-from typing import Any, Callable
-
-import jax.numpy as jnp
-import numpy as onp
-from jax import grad, jit, random
-from jax.experimental import optimizers
+from typing import Any, Callable, List, Tuple
 
 import catenets.logger as log
+import jax.numpy as jnp
+import numpy as onp
 from catenets.models.base import BaseCATENet, OutputHead, train_output_net_only
 from catenets.models.constants import (
     DEFAULT_AVG_OBJECTIVE,
@@ -34,6 +31,8 @@ from catenets.models.model_utils import (
     heads_l2_penalty,
     make_val_split,
 )
+from jax import grad, jit, random
+from jax.experimental import optimizers
 
 
 class TNet(BaseCATENet):
@@ -322,7 +321,9 @@ def _train_tnet_jointly(
     # loss functions for the head
     if not binary_y:
 
-        def loss_head(params: dict, batch: jnp.ndarray) -> jnp.ndarray:
+        def loss_head(
+            params: List, batch: Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]
+        ) -> jnp.ndarray:
             # mse loss function
             inputs, targets, weights = batch
             preds = predict_fun_head(params, inputs)
@@ -330,7 +331,9 @@ def _train_tnet_jointly(
 
     else:
 
-        def loss_head(params: dict, batch: jnp.ndarray) -> jnp.ndarray:
+        def loss_head(
+            params: List, batch: Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]
+        ) -> jnp.ndarray:
             # mse loss function
             inputs, targets, weights = batch
             preds = predict_fun_head(params, inputs)
@@ -341,7 +344,10 @@ def _train_tnet_jointly(
 
     @jit
     def loss_tnet(
-        params: dict, batch: jnp.ndarray, penalty_l2: float, penalty_diff: float
+        params: List,
+        batch: Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray],
+        penalty_l2: float,
+        penalty_diff: float,
     ) -> jnp.ndarray:
         # params: list[representation, head_0, head_1]
         # batch: (X, y, w)

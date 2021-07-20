@@ -3,17 +3,11 @@ Author: Alicia Curth
 Base modules shared across different nets
 """
 import abc
-from typing import Any, Callable, Optional, Tuple
-
-import jax.numpy as jnp
-import numpy as onp
-from jax import grad, jit, random
-from jax.experimental import optimizers, stax
-from jax.experimental.stax import Dense, Elu, Relu, Sigmoid
-from sklearn.base import BaseEstimator, RegressorMixin
-from sklearn.model_selection import ParameterGrid
+from typing import Any, Callable, List, Optional, Tuple
 
 import catenets.logger as log
+import jax.numpy as jnp
+import numpy as onp
 from catenets.models.constants import (
     DEFAULT_BATCH_SIZE,
     DEFAULT_LAYERS_OUT,
@@ -35,6 +29,11 @@ from catenets.models.model_utils import (
     check_X_is_np,
     make_val_split,
 )
+from jax import grad, jit, random
+from jax.experimental import optimizers, stax
+from jax.experimental.stax import Dense, Elu, Relu, Sigmoid
+from sklearn.base import BaseEstimator, RegressorMixin
+from sklearn.model_selection import ParameterGrid
 
 
 def ReprBlock(
@@ -314,7 +313,9 @@ def train_output_net_only(
     if not binary_y:
         # define loss and grad
         @jit
-        def loss(params: dict, batch: jnp.ndarray, penalty: float) -> jnp.ndarray:
+        def loss(
+            params: List, batch: Tuple[jnp.ndarray, jnp.ndarray], penalty: float
+        ) -> jnp.ndarray:
             # mse loss function
             inputs, targets = batch
             preds = predict_fun(params, inputs)
@@ -332,7 +333,9 @@ def train_output_net_only(
     else:
         # get loss and grad
         @jit
-        def loss(params: dict, batch: jnp.ndarray, penalty: float) -> jnp.ndarray:
+        def loss(
+            params: List, batch: Tuple[jnp.ndarray, jnp.ndarray], penalty: float
+        ) -> jnp.ndarray:
             # mse loss function
             inputs, targets = batch
             preds = predict_fun(params, inputs)
@@ -391,7 +394,7 @@ def train_output_net_only(
             next_batch = X[idx_next, :], y[idx_next, :]
             opt_state = update(i * n_batches + b, opt_state, next_batch, penalty_l2)
 
-        if (n_iter_print == 0) or early_stopping:
+        if (i % n_iter_print == 0) or early_stopping:
             params_curr = get_params(opt_state)
             l_curr = loss(params_curr, (X_val, y_val), penalty_l2)
 

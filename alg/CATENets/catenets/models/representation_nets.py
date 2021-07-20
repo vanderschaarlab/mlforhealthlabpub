@@ -5,12 +5,9 @@ DragonNet from Shi et al (2019), respectively.
 """
 from typing import Any, Callable, List, Tuple
 
+import catenets.logger as log
 import jax.numpy as jnp
 import numpy as onp
-from jax import grad, jit, random
-from jax.experimental import optimizers
-
-import catenets.logger as log
 from catenets.models.base import BaseCATENet, OutputHead, ReprBlock
 from catenets.models.constants import (
     DEFAULT_AVG_OBJECTIVE,
@@ -36,6 +33,8 @@ from catenets.models.model_utils import (
     heads_l2_penalty,
     make_val_split,
 )
+from jax import grad, jit, random
+from jax.experimental import optimizers
 
 
 class SNet1(BaseCATENet):
@@ -418,7 +417,9 @@ def train_snet1(
     # loss functions for the head
     if not binary_y:
 
-        def loss_head(params: dict, batch: jnp.ndarray) -> jnp.ndarray:
+        def loss_head(
+            params: List, batch: Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]
+        ) -> jnp.ndarray:
             # mse loss function
             inputs, targets, weights = batch
             preds = predict_fun_head(params, inputs)
@@ -426,7 +427,9 @@ def train_snet1(
 
     else:
 
-        def loss_head(params: dict, batch: jnp.ndarray) -> jnp.ndarray:
+        def loss_head(
+            params: List, batch: Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]
+        ) -> jnp.ndarray:
             # mse loss function
             inputs, targets, weights = batch
             preds = predict_fun_head(params, inputs)
@@ -438,8 +441,8 @@ def train_snet1(
     # complete loss function for all parts
     @jit
     def loss_snet1(
-        params: dict,
-        batch: jnp.ndarray,
+        params: List,
+        batch: Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray],
         penalty_l2: float,
         penalty_disc: float,
         penalty_diff: float,
@@ -648,7 +651,9 @@ def train_snet2(
     # loss functions for the head
     if not binary_y:
 
-        def loss_head(params: dict, batch: jnp.ndarray) -> jnp.ndarray:
+        def loss_head(
+            params: List, batch: Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]
+        ) -> jnp.ndarray:
             # mse loss function
             inputs, targets, weights = batch
             preds = predict_fun_head_po(params, inputs)
@@ -656,7 +661,9 @@ def train_snet2(
 
     else:
 
-        def loss_head(params: dict, batch: jnp.ndarray) -> jnp.ndarray:
+        def loss_head(
+            params: List, batch: Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]
+        ) -> jnp.ndarray:
             # log loss function
             inputs, targets, weights = batch
             preds = predict_fun_head_po(params, inputs)
@@ -665,7 +672,9 @@ def train_snet2(
                 * (targets * jnp.log(preds) + (1 - targets) * jnp.log(1 - preds))
             )
 
-    def loss_head_prop(params: dict, batch: jnp.ndarray, penalty: float) -> jnp.ndarray:
+    def loss_head_prop(
+        params: List, batch: Tuple[jnp.ndarray, jnp.ndarray], penalty: float
+    ) -> jnp.ndarray:
         # log loss function for propensities
         inputs, targets = batch
         preds = predict_fun_head_prop(params, inputs)
@@ -675,7 +684,10 @@ def train_snet2(
     # complete loss function for all parts
     @jit
     def loss_snet2(
-        params: dict, batch: jnp.ndarray, penalty_l2: float, penalty_diff: float
+        params: List,
+        batch: Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray],
+        penalty_l2: float,
+        penalty_diff: float,
     ) -> jnp.ndarray:
         # params: list[representation, head_0, head_1, head_prop]
         # batch: (X, y, w)

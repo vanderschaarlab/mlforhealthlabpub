@@ -5,11 +5,10 @@ RA-learner.
 """
 from typing import Callable, Optional, Tuple
 
+import catenets.logger as log
+import jax.numpy as jnp
 import numpy as onp
 import pandas as pd
-from sklearn.model_selection import StratifiedKFold
-
-import catenets.logger as log
 from catenets.models.base import BaseCATENet, train_output_net_only
 from catenets.models.constants import (
     DEFAULT_AVG_OBJECTIVE,
@@ -60,6 +59,7 @@ from catenets.models.transformation_utils import (
     RA_TRANSFORMATION,
     _get_transformation_function,
 )
+from sklearn.model_selection import StratifiedKFold
 
 T_STRATEGY = "T"
 S1_STRATEGY = "S1"
@@ -503,7 +503,7 @@ def train_pseudooutcome_net(
     n_units_r_small: int = DEFAULT_UNITS_R_SMALL_S,
     nonlin: str = DEFAULT_NONLIN,
     avg_objective: bool = DEFAULT_AVG_OBJECTIVE,
-) -> Tuple[onp.ndarray, onp.ndarray, onp.ndarray]:
+) -> Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray]:
     # get shape of data
     n, d = X.shape
 

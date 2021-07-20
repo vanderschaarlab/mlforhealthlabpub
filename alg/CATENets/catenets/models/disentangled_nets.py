@@ -5,12 +5,9 @@ Hassanpour and Greiner (2020) and Wu et al (2020).
 """
 from typing import Any, Callable, List, Tuple
 
+import catenets.logger as log
 import jax.numpy as jnp
 import numpy as onp
-from jax import grad, jit, random
-from jax.experimental import optimizers
-
-import catenets.logger as log
 from catenets.models.base import BaseCATENet, OutputHead, ReprBlock
 from catenets.models.constants import (
     DEFAULT_AVG_OBJECTIVE,
@@ -37,6 +34,8 @@ from catenets.models.model_utils import (
     make_val_split,
 )
 from catenets.models.representation_nets import mmd2_lin
+from jax import grad, jit, random
+from jax.experimental import optimizers
 
 DEFAULT_UNITS_R_BIG_S3 = 150
 DEFAULT_UNITS_R_SMALL_S3 = 50
@@ -277,7 +276,11 @@ def train_snet3(
     # loss functions for the head
     if not binary_y:
 
-        def loss_head(params: dict, batch: jnp.ndarray, penalty: float) -> jnp.ndarray:
+        def loss_head(
+            params: List,
+            batch: Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray],
+            penalty: float,
+        ) -> jnp.ndarray:
             # mse loss function
             inputs, targets, weights = batch
             preds = predict_fun_head_po(params, inputs)
@@ -285,7 +288,11 @@ def train_snet3(
 
     else:
 
-        def loss_head(params: dict, batch: jnp.ndarray, penalty: float) -> jnp.ndarray:
+        def loss_head(
+            params: List,
+            batch: Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray],
+            penalty: float,
+        ) -> jnp.ndarray:
             # log loss function
             inputs, targets, weights = batch
             preds = predict_fun_head_po(params, inputs)
@@ -294,7 +301,11 @@ def train_snet3(
                 * (targets * jnp.log(preds) + (1 - targets) * jnp.log(1 - preds))
             )
 
-    def loss_head_prop(params: dict, batch: jnp.ndarray, penalty: float) -> jnp.ndarray:
+    def loss_head_prop(
+        params: List,
+        batch: Tuple[jnp.ndarray, jnp.ndarray],
+        penalty: float,
+    ) -> jnp.ndarray:
         # log loss function for propensities
         inputs, targets = batch
         preds = predict_fun_head_prop(params, inputs)
@@ -303,8 +314,8 @@ def train_snet3(
     # complete loss function for all parts
     @jit
     def loss_snet3(
-        params: dict,
-        batch: jnp.ndarray,
+        params: List,
+        batch: Tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray],
         penalty_l2: float,
         penalty_orthogonal: float,
         penalty_disc: float,

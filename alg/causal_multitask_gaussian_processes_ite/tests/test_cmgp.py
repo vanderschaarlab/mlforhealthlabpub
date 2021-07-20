@@ -1,51 +1,51 @@
 import sys
+from typing import Tuple
 
-import ganite.logger as log
+import cmgp.logger as log
+import numpy as np
 import pytest
-from ganite import Ganite
-from ganite.datasets import load
-from ganite.utils.metrics import sqrt_PEHE_with_diff
+from cmgp import CMGP
+from cmgp.datasets import load
+from cmgp.utils.metrics import sqrt_PEHE_with_diff
 
 log.add(sink=sys.stderr, level="DEBUG")
+
+
+def downsample(
+    X: np.ndarray, W: np.ndarray, Y: np.ndarray, downsample: int = 500
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    X = X[:downsample]
+    W = W[:downsample]
+    Y = Y[:downsample]
+    return X, W, Y
 
 
 def test_model_sanity() -> None:
     X_train, W_train, Y_train, Y_train_full, X_test, Y_test = load("twins")
 
-    model = Ganite(
-        X_train,
-        W_train,
-        Y_train,
-        num_iterations=12,
-        dim_hidden=3,
-        depth=2,
-        alpha=0.5,
-        beta=0.1,
-        minibatch_size=16,
-        num_discr_iterations=7,
-    )
+    X_train, W_train, Y_train = downsample(X_train, W_train, Y_train, 500)
 
-    assert model.minibatch_size == 16
-    assert model.alpha == 0.5
-    assert model.beta == 0.1
-    assert model.depth == 2
-    assert model.num_discr_iterations == 7
-    assert model.num_iterations == 12
+    model = CMGP(X_train, W_train, Y_train, max_gp_iterations=7, mode="CMGP")
 
-    pred = model.predict(X_test).to_numpy()
+    assert model.max_gp_iterations == 7
+    assert model.mode == "CMGP"
+
+    pred = model.predict(X_test)
 
     assert len(pred) == len(Y_test)
 
 
-@pytest.mark.parametrize("dataset, pehe_threshold", [("twins", 0.4), ("ihdp", 4.5)])
+@pytest.mark.parametrize("dataset, pehe_threshold", [("twins", 0.4), ("ihdp", 1.5)])
 def test_model_training(dataset: str, pehe_threshold: float) -> None:
     X_train, W_train, Y_train, Y_train_full, X_test, Y_test = load(dataset)
 
-    model = Ganite(X_train, W_train, Y_train, num_iterations=500)
+    X_train, W_train, Y_train = downsample(X_train, W_train, Y_train, 1000)
 
-    pred = model.predict(X_test).to_numpy()
+    model = CMGP(X_train, W_train, Y_train, max_gp_iterations=500)
+
+    pred = model.predict(X_test)
 
     pehe = sqrt_PEHE_with_diff(Y_test, pred)
-    print(f"PEHE score for GANITE on {dataset} = {pehe}")
+    print(f"PEHE score for CMGP on {dataset} = {pehe}")
 
     assert pehe < pehe_threshold

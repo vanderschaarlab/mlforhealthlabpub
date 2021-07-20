@@ -18,7 +18,6 @@ class CMGP:
         X: np.ndarray,
         Treatments: np.ndarray,
         Y: np.ndarray,
-        mod: str = "Multitask",
         mode: str = "CMGP",
         max_gp_iterations: int = 1000,
     ) -> None:
@@ -42,7 +41,6 @@ class CMGP:
 
         self.dim = dim
         self.dim_outcome = dim_outcome
-        self.mod = mod
         self.mode = mode
         self.max_gp_iterations = max_gp_iterations
 

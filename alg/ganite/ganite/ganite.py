@@ -7,7 +7,7 @@ import ganite.logger as log
 import numpy as np
 import pandas as pd
 import torch
-from ganite.utils import enable_reproducible_results
+from ganite.utils.random import enable_reproducible_results
 from torch import nn
 
 EPS = 1e-10

@@ -1,6 +1,3 @@
-# Copyright (c) 2019, Ahmed M. Alaa
-# Licensed under the BSD 3-clause license (see LICENSE.txt)
-
 # stdlib
 from typing import Tuple
 

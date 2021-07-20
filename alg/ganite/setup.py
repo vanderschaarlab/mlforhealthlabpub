@@ -20,11 +20,8 @@ def find_version() -> str:
     return version
 
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
-
-with open("requirements.txt") as fp:
-    install_requires = fp.read()
+long_description = read("README.md")
+install_requires = read("requirements.txt")
 
 setuptools.setup(
     name="ganite",

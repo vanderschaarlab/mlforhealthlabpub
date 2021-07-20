@@ -39,9 +39,9 @@ def test_model_sanity() -> None:
 def test_model_training(dataset: str, pehe_threshold: float) -> None:
     X_train, W_train, Y_train, Y_train_full, X_test, Y_test = load(dataset)
 
-    X_train, W_train, Y_train = downsample(X_train, W_train, Y_train, 1000)
+    X_train, W_train, Y_train = downsample(X_train, W_train, Y_train, 500)
 
-    model = CMGP(X_train, W_train, Y_train, max_gp_iterations=500)
+    model = CMGP(X_train, W_train, Y_train, max_gp_iterations=100)
 
     pred = model.predict(X_test)
 

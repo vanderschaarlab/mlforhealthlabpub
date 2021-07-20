@@ -13,7 +13,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: [3.7, 3.8, 3.9]
         os: [macos-latest]
 
     steps:
@@ -34,7 +34,6 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - cp36-cp36m
           - cp37-cp37m
           - cp38-cp38
           - cp39-cp39

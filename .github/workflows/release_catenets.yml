@@ -1,4 +1,4 @@
-name: Package release
+name: CATENets Package release
 
 on:
   release:

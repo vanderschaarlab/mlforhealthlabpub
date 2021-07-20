@@ -9,7 +9,7 @@ from loguru import logger
 LOG_FORMAT = "[{time}][{process.id}][{level}] {message}"
 
 logger.remove()
-DEFAULT_SINK = "catenets_{time}.log"
+DEFAULT_SINK = "ganite_{time}.log"
 
 
 def remove() -> None:

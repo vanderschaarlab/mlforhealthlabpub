@@ -28,6 +28,7 @@ MODEL_PARAMS = {
     "n_layers_out_t": LAYERS_OUT,
     "n_layers_r_t": LAYERS_R,
     "penalty_l2_t": PENALTY_L2,
+    "binary_y": True,
 }
 
 ALL_MODELS = get_model_set(model_selection="all", model_params=MODEL_PARAMS)

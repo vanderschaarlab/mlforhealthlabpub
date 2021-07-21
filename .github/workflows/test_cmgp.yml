@@ -5,8 +5,8 @@ on:
     branches: [main, release]
   pull_request:
     types: [opened, synchronize, reopened]
-    #paths:
-    #    - "alg/causal_multitask_gaussian_processes_ite/*"
+    paths:
+        - "alg/causal_multitask_gaussian_processes_ite/*"
 
 defaults:
   run:

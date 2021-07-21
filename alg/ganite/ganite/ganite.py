@@ -167,18 +167,21 @@ class Ganite:
         Treatments = np.asarray(Treatments)
         Y = np.asarray(Y)
 
-        assert not np.isnan(np.sum(X)), "X contains NaNs"
-        assert len(X) == len(Treatments), "Features/Treatments mismatch"
-        assert len(X) == len(Y), "Features/Treatments mismatch"
+        if np.isnan(np.sum(X)):
+            raise ValueError("X contains NaNs")
+        if len(X) != len(Treatments):
+            raise ValueError("Features/Treatments mismatch")
+        if len(X) != len(Y):
+            raise ValueError("Features/Labels mismatch")
+
         enable_reproducible_results()
 
         dim_in = X.shape[1]
         self.original_treatments = np.sort(np.unique(Treatments))
         self.treatments = [0, 1]
 
-        assert (
-            len(self.original_treatments) == 2
-        ), "Only two treatment categories supported"
+        if len(self.original_treatments) != 2:
+            raise ValueError("Only two treatment categories supported")
 
         # Hyperparameters
         self.minibatch_size = minibatch_size
@@ -254,8 +257,10 @@ class Ganite:
                 Tilde = self.counterfactual_generator(X_mb, T_mb, Y_mb).clone()
                 D_out = self.counterfactual_discriminator(X_mb, T_mb, Y_mb, Tilde)
 
-                assert not torch.isnan(Tilde).any()
-                assert not torch.isnan(D_out).any()
+                if torch.isnan(Tilde).any():
+                    raise RuntimeError("counterfactual_generator generated NaNs")
+                if torch.isnan(D_out).any():
+                    raise RuntimeError("counterfactual_discriminator generated NaNs")
 
                 D_loss = nn.BCELoss()(D_out, T_mb)
 
@@ -279,8 +284,12 @@ class Ganite:
 
             if it % 100 == 0:
                 log.debug(f"Generator loss epoch {it}: {D_loss} {G_loss}")
-                assert not torch.isnan(D_loss).any()
-                assert not torch.isnan(G_loss).any()
+                if torch.isnan(D_loss).any():
+                    raise RuntimeError("counterfactual_discriminator generated NaNs")
+
+                if torch.isnan(G_loss).any():
+                    raise RuntimeError("counterfactual_generator generated NaNs")
+
             G_loss.backward()
             self.DG_solver.step()
 

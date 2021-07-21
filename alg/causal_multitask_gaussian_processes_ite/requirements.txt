@@ -1,0 +1,7 @@
+GPy
+loguru
+matplotlib
+numpy
+pandas
+scikit_learn
+scipy

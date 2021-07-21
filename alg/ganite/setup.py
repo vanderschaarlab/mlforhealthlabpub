@@ -36,7 +36,10 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "Topic :: Machine learning :: Healthcare",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
+        "Intended Audience :: Healthcare Industry",
+        "License :: OSI Approved :: BSD License",
+        "Operating System :: OS Independent",
     ],
     install_requires=install_requires,
 )

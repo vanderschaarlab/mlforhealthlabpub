@@ -1,8 +1,8 @@
 name: CATENets Package release
 
-on:
-  release:
-    types: [created]
+#on:
+#  release:
+#    types: [created]
 
 defaults:
   run:

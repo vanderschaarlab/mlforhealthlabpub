@@ -65,12 +65,13 @@ VIME: Extending the Success of Self- and Semi-supervised Learning to Tabular Dom
 Scalable Bayesian Inverse Reinforcement Learning [[Link]](https://openreview.net/pdf?id=4qR3coiNaIv) | ICLR 2021 | [alg/scalable-birl](alg/scalable-birl)
 Nonparametric Estimation of Heterogeneous Treatment Effects: From Theory to Learning Algorithms [[Link]](https://arxiv.org/abs/2101.10943) | AISTATS 2021 | [alg/CATENets](alg/CATENets)
 Learning Matching Representations for Individualized Organ Transplantation Allocation [[Link]](https://arxiv.org/abs/2101.11769) | AISTATS 2021| [alg/MatchingRep](alg/MatchingRep)
+Explaining by Imitating: Understanding Decisions by Interpretable Policy Learning [[Link]](https://openreview.net/forum?id=unI5ucw_Jk) | ICLR 2021 | [alg/interpole](alg/interpole)
 <br/>
 
 Details of apps and other software is listed below:
 
 App/Software [[Link]](#) | Description | Publication | Code
---- | --- | --- | --- 
+--- | --- | --- | ---
 Adjutorium COVID-19 [[Link]](https://www.vanderschaar-lab.com/paper-on-covid-19-hospital-capacity-planning-published-in-machine-learning/) | Adjutorium COVID-19: an AI-powered tool that accurately predicts how COVID-19 will impact resource needs (ventilators, ICU beds, etc.) at the individual patient level and the hospital level | - | [app/adjutorium-covid19-public](app/adjutorium-covid19-public)
 Clairvoyance [[Link]](https://www.vanderschaar-lab.com/clairvoyance-alpha-the-first-unified-end-to-end-automl-pipeline-for-time-series-data/) | Clairvoyance: A Pipeline Toolkit for Medical Time Series | - | [clairvoyance repository](https://github.com/vanderschaarlab/clairvoyance)
 Hide-and-Seek Privacy Challenge [[Link]](http://www.vanderschaar-lab.com/privacy-challenge/) | Hide-and-Seek Privacy Challenge: Synthetic Data Generation vs. Patient Re-identification with Clinical Time-series Data | [NeurIPS 2020 competition track](https://arxiv.org/abs/2007.12087) | [app/hide-and-seek](app/hide-and-seek)

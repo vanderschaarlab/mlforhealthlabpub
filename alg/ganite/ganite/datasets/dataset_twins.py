@@ -26,6 +26,7 @@ import ganite.logger as log
 
 # third party
 import numpy as np
+import pandas as pd
 from scipy.special import expit
 
 from .network import download_if_needed
@@ -53,14 +54,63 @@ def preprocess(fn_csv: Path, train_rate: float = 0.8) -> Tuple:
     """
 
     # Load original data (11400 patients, 30 features, 2 dimensional potential outcomes)
-    ori_data = np.loadtxt(fn_csv, delimiter=",", skiprows=1)
+    df = pd.read_csv(fn_csv)
+    columns = []
+    for col in df.columns:
+        columns.append(col.replace("'", "").replace("’", ""))
+
+    df.columns = columns
+
+    label_list = ["outcome(t=0)", "outcome(t=1)"]
+
+    # 8: factor not on certificate, 9: factor not classifiable --> np.nan --> mode imputation
+    medrisk_list = [
+        "anemia",
+        "cardiac",
+        "lung",
+        "diabetes",
+        "herpes",
+        "hydra",
+        "hemo",
+        "chyper",
+        "phyper",
+        "eclamp",
+        "incervix",
+        "pre4000",
+        "dtotord",
+        "preterm",
+        "renal",
+        "rh",
+        "uterine",
+        "othermr",
+    ]
+    # 99: missing
+    other_list = ["cigar", "drink", "wtgain", "gestat", "dmeduc", "nprevist"]
+
+    other_list2 = ["pldel", "resstatb"]  # but no samples are missing..
+
+    bin_list = ["dmar"] + medrisk_list
+    con_list = ["dmage", "mpcb"] + other_list
+    cat_list = ["adequacy"] + other_list2
+
+    # Imputation
+    for feat in medrisk_list:
+        df[feat] = df[feat].apply(lambda x: df[feat].mode()[0] if x in [8, 9] else x)
+
+    for feat in other_list:
+        df.loc[df[feat] == 99, feat] = df.loc[df[feat] != 99, feat].mean()
+
+    df_new = df[con_list + bin_list]
+
+    for feat in cat_list:
+        df_new = pd.concat([df_new, pd.get_dummies(df[feat], prefix=feat)], axis=1)
 
     # Define features
-    x = ori_data[:, :30]
+    x = df.values
     no, dim = x.shape
 
     # Define potential outcomes
-    potential_y = ori_data[:, 30:]
+    potential_y = df[label_list].values
     # Die within 1 year = 1, otherwise = 0
     potential_y = np.array(potential_y < 9999, dtype=int)
 

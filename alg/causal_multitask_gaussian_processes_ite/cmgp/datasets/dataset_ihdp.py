@@ -1,8 +1,11 @@
+"""
+IHDP (Infant Health and Development Program) dataset
+"""
 # stdlib
 import os
 import random
 from pathlib import Path
-from typing import Tuple
+from typing import Any, Tuple
 
 import cmgp.logger as log
 
@@ -22,7 +25,19 @@ TEST_URL = "https://www.fredjo.com/files/ihdp_npci_1-100.test.npz"
 
 # helper functions
 def load_data_npz(fname: Path, get_po: bool = True) -> dict:
-    """Load data set (adapted from https://github.com/clinicalml/cfrnet)"""
+    """
+    Helper function for loading the IHDP data set (adapted from https://github.com/clinicalml/cfrnet)
+
+    Parameters
+    ----------
+    fname: Path
+        Dataset path
+
+    Returns
+    -------
+    data: dict
+        Raw IHDP dict, with X, w, y and yf keys.
+    """
     data_in = np.load(fname)
     data = {"X": data_in["x"], "w": data_in["t"], "y": data_in["yf"]}
     try:
@@ -42,9 +57,43 @@ def load_data_npz(fname: Path, get_po: bool = True) -> dict:
 
 
 def prepare_ihdp_data(
-    data_train: dict, data_test: dict, rescale: bool = True, return_pos: bool = False
+    data_train: dict,
+    data_test: dict,
+    rescale: bool = True,
+    setting: str = "C",
+    return_pos: bool = False,
 ) -> Tuple:
-    """Prepare data"""
+    """
+    Helper for preprocessing the IHDP dataset.
+
+    Parameters
+    ----------
+    data_train: pd.DataFrame or dict
+        Train dataset
+    data_test: pd.DataFrame or dict
+        Test dataset
+    rescale: bool, default True
+        Rescale the outcomes to have similar scale
+    setting: str, default C
+        Experiment setting
+    return_pos: bool
+        Return potential outcomes
+
+    Returns
+    -------
+    X: dict or pd.DataFrame
+        Training Feature set
+    y: pd.DataFrame or list
+        Outcome list
+    t: pd.DataFrame or list
+        Treatment list
+    cate_true_in: pd.DataFrame or list
+        Average treatment effects for the training set
+    X_t: pd.Dataframe or list
+        Test feature set
+    cate_true_out: pd.DataFrame of list
+        Average treatment effects for the testing set
+    """
 
     X, y, w, mu0, mu1 = (
         data_train["X"],
@@ -61,6 +110,10 @@ def prepare_ihdp_data(
         data_test["mu0"],
         data_test["mu1"],
     )
+    if setting == "D":
+        y[w == 1] = y[w == 1] + mu0[w == 1]
+        mu1 = mu0 + mu1
+        mu1_t = mu0_t + mu1_t
 
     if rescale:
         # rescale all outcomes to have similar scale of CATEs if sd_cate > 1
@@ -88,7 +141,21 @@ def prepare_ihdp_data(
 
 
 def get_one_data_set(D: dict, i_exp: int, get_po: bool = True) -> dict:
-    """Get data for one experiment. Adapted from https://github.com/clinicalml/cfrnet"""
+    """
+    Helper for getting the IHDP data for one experiment. Adapted from https://github.com/clinicalml/cfrnet
+
+    Parameters
+    ----------
+    D: dict or pd.DataFrame
+        All the experiment
+    i_exp: int
+        Experiment number
+
+    Returns
+    -------
+    data: dict or pd.Dataframe
+        dict with the experiment
+    """
     D_exp = {}
     D_exp["X"] = D["X"][:, :, i_exp - 1]
     D_exp["w"] = D["w"][:, i_exp - 1 : i_exp]
@@ -105,12 +172,30 @@ def get_one_data_set(D: dict, i_exp: int, get_po: bool = True) -> dict:
     return D_exp
 
 
-def load(data_path: Path, train_split: float = 0.8) -> Tuple:
+def load(data_path: Path, *args: Any, **kwargs: Any) -> Tuple:
     """
-    Download the dataset if needed.
-    Load the dataset.
-    Preprocess the data.
-    Return train/test split.
+    Get IHDP train/test datasets with treatments and labels.
+
+    Parameters
+    ----------
+    data_path: Path
+        Path to the dataset csv. If the data is missing, it will be downloaded.
+
+
+    Returns
+    -------
+    X: pd.Dataframe or array
+        The training feature set
+    w: pd.DataFrame or array
+        Training treatment assignments.
+    y: pd.Dataframe or array
+        The training labels
+    training potential outcomes: pd.DataFrame or array.
+        Potential outcomes for the training set.
+    X_t: pd.DataFrame or array
+        The testing feature set
+    testing potential outcomes: pd.DataFrame of array
+        Potential outcomes for the testing set.
     """
     data_train, data_test = load_raw(data_path)
 
@@ -140,7 +225,7 @@ def load(data_path: Path, train_split: float = 0.8) -> Tuple:
         X,
         w,
         y,
-        cate_true_in,
+        np.asarray([mu0, mu1]).squeeze().T,
         X_t,
         np.asarray([mu0_t, mu1_t]).squeeze().T,
     )
@@ -148,8 +233,20 @@ def load(data_path: Path, train_split: float = 0.8) -> Tuple:
 
 def load_raw(data_path: Path) -> Tuple:
     """
-    Download the dataset if needed.
-    Load the dataset.
+    Get IHDP raw train/test sets.
+
+    Parameters
+    ----------
+    data_path: Path
+        Path to the dataset csv. If the data is missing, it will be downloaded.
+
+    Returns
+    -------
+
+    data_train: dict or pd.DataFrame
+        Training data
+    data_test: dict or pd.DataFrame
+        Testing data
     """
 
     try:
@@ -162,8 +259,8 @@ def load_raw(data_path: Path) -> Tuple:
 
     log.debug(f"load raw dataset f{train_csv}")
 
-    download_if_needed(train_csv, TRAIN_URL)
-    download_if_needed(test_csv, TEST_URL)
+    download_if_needed(train_csv, http_url=TRAIN_URL)
+    download_if_needed(test_csv, http_url=TEST_URL)
 
     data_train = load_data_npz(train_csv, get_po=True)
     data_test = load_data_npz(test_csv, get_po=True)

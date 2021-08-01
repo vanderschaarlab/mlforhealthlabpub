@@ -37,11 +37,11 @@ from ganite.datasets import load
 from ganite.utils.metrics import sqrt_PEHE_with_diff
 
 X_train, W_train, Y_train, Y_train_full, X_test, Y_test = load("twins")
- 
+
 model = Ganite(X_train, W_train, Y_train, num_iterations=500)
- 
-pred = model.predict(X_test).to_numpy()
- 
+
+pred = model(X_test).numpy()
+
 pehe = sqrt_PEHE_with_diff(Y_test, pred)
 
 print(f"PEHE score for GANITE on {dataset} = {pehe}")

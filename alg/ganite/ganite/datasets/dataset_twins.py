@@ -9,7 +9,7 @@ import random
 from pathlib import Path
 from typing import Tuple
 
-import catenets.logger as log
+import ganite.logger as log
 
 # third party
 import numpy as np

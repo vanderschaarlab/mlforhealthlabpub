@@ -5,11 +5,11 @@ import ganite.logger as log
 
 # third party
 import numpy as np
-import pandas as pd
 import torch
 from ganite.utils.random import enable_reproducible_results
 from torch import nn
 
+DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 EPS = 1e-10
 
 
@@ -21,22 +21,30 @@ class CounterfactualGenerator(nn.Module):
     """
 
     def __init__(
-        self, Dim: int, TreatmentsCnt: int, DimHidden: int, depth: int
+        self, Dim: int, TreatmentsCnt: int, DimHidden: int, depth: int, binary_y: bool
     ) -> None:
         super(CounterfactualGenerator, self).__init__()
         # Generator Layer
-        hidden = [
-            nn.Linear(DimHidden, DimHidden),
-            nn.LeakyReLU(),
-        ] * depth
+        hidden = []
+
+        for d in range(depth):
+            hidden.extend(
+                [
+                    nn.Dropout(),
+                    nn.Linear(DimHidden, DimHidden),
+                    nn.LeakyReLU(),
+                ]
+            )
+
         self.common = nn.Sequential(
             nn.Linear(
                 Dim + 2, DimHidden
             ),  # Inputs: X + Treatment (1) + Factual Outcome (1) + Random Vector      (Z)
             nn.LeakyReLU(),
             *hidden,
-        )
+        ).to(DEVICE)
 
+        self.binary_y = binary_y
         self.outs = []
         for tidx in range(TreatmentsCnt):
             self.outs.append(
@@ -44,24 +52,25 @@ class CounterfactualGenerator(nn.Module):
                     nn.Linear(DimHidden, DimHidden),
                     nn.LeakyReLU(),
                     nn.Linear(DimHidden, 1),
-                    nn.Sigmoid(),
-                )
+                ).to(DEVICE)
             )
 
     def forward(
         self, x: torch.Tensor, t: torch.Tensor, y: torch.Tensor
     ) -> torch.Tensor:
-        inputs = torch.cat([x, t, y], dim=1)
+        inputs = torch.cat([x, t, y], dim=1).to(DEVICE)
+
         G_h2 = self.common(inputs)
 
-        G_probs = []
-        for out in self.outs:
-            res = out(G_h2) + EPS
-            G_probs.append(res)
+        G_prob1 = self.outs[0](G_h2)
+        G_prob2 = self.outs[1](G_h2)
 
-        G_prob = torch.cat(G_probs, dim=-1)
+        G_prob = torch.cat([G_prob1, G_prob2], dim=1).to(DEVICE)
 
-        return G_prob
+        if self.binary_y:
+            return torch.sigmoid(G_prob)
+        else:
+            return G_prob
 
 
 class CounterfactualDiscriminator(nn.Module):
@@ -71,12 +80,19 @@ class CounterfactualDiscriminator(nn.Module):
     is the factual outcome.
     """
 
-    def __init__(self, Dim: int, Treatments: list, DimHidden: int, depth: int) -> None:
+    def __init__(
+        self, Dim: int, Treatments: list, DimHidden: int, depth: int, binary_y: bool
+    ) -> None:
         super(CounterfactualDiscriminator, self).__init__()
-        hidden = [
-            nn.Linear(DimHidden, DimHidden),
-            nn.LeakyReLU(),
-        ] * depth
+        hidden = []
+
+        for d in range(depth):
+            hidden.extend(
+                [
+                    nn.Linear(DimHidden, DimHidden),
+                    nn.LeakyReLU(),
+                ]
+            )
 
         self.Treatments = Treatments
 
@@ -86,21 +102,16 @@ class CounterfactualDiscriminator(nn.Module):
             *hidden,
             nn.Linear(DimHidden, 1),
             nn.Sigmoid(),
-        )
+        ).to(DEVICE)
 
     def forward(
         self, x: torch.Tensor, t: torch.Tensor, y: torch.Tensor, hat_y: torch.Tensor
     ) -> torch.Tensor:
         # Factual & Counterfactual outcomes concatenate
+        inp0 = (1.0 - t) * y + t * hat_y[:, 0].reshape([-1, 1])
+        inp1 = t * y + (1.0 - t) * hat_y[:, 1].reshape([-1, 1])
 
-        raw = [x]
-        for idx, tidx in enumerate(self.Treatments):
-            raw.append(
-                (t == tidx).int() * y
-                + (t != tidx).int() * hat_y[:, idx].reshape([-1, 1])
-            )
-        inputs = torch.cat(raw, dim=-1)
-
+        inputs = torch.cat([x, inp0, inp1], dim=1).to(DEVICE)
         return self.model(inputs)
 
 
@@ -110,18 +121,26 @@ class InferenceNets(nn.Module):
     """
 
     def __init__(
-        self, Dim: int, TreatmentsCnt: int, DimHidden: int, depth: int
+        self, Dim: int, TreatmentsCnt: int, DimHidden: int, depth: int, binary_y: bool
     ) -> None:
         super(InferenceNets, self).__init__()
-        hidden = [
-            nn.Linear(DimHidden, DimHidden),
-            nn.LeakyReLU(),
-        ] * depth
+        hidden = []
+
+        for d in range(depth):
+            hidden.extend(
+                [
+                    nn.Linear(DimHidden, DimHidden),
+                    nn.LeakyReLU(),
+                ]
+            )
+
         self.common = nn.Sequential(
             nn.Linear(Dim, DimHidden),
             nn.LeakyReLU(),
             *hidden,
-        )
+        ).to(DEVICE)
+        self.binary_y = binary_y
+
         self.outs = []
         for tidx in range(TreatmentsCnt):
             self.outs.append(
@@ -129,7 +148,7 @@ class InferenceNets(nn.Module):
                     nn.Linear(DimHidden, DimHidden),
                     nn.LeakyReLU(),
                     nn.Linear(DimHidden, 1),
-                )
+                ).to(DEVICE)
             )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -139,10 +158,13 @@ class InferenceNets(nn.Module):
         for out in self.outs:
             I_probs.append(out(I_h))
 
-        return torch.sigmoid(torch.cat(I_probs, dim=1))
+        if self.binary_y:
+            return torch.sigmoid(torch.cat(I_probs, dim=1).to(DEVICE))
+        else:
+            return torch.cat(I_probs, dim=1).to(DEVICE)
 
 
-class Ganite:
+class Ganite(nn.Module):
     """
     The GANITE framework generates potential outcomes for a given feature vector x.
     It consists of 2 components:
@@ -152,22 +174,24 @@ class Ganite:
 
     def __init__(
         self,
-        X: np.ndarray,
-        Treatments: np.ndarray,
-        Y: np.ndarray,
-        dim_hidden: int = 40,
-        alpha: float = 1,
-        beta: float = 1,
+        X: torch.Tensor,
+        Treatments: torch.Tensor,
+        Y: torch.Tensor,
+        dim_hidden: int = 100,
+        alpha: float = 0.1,
+        beta: float = 0,
         minibatch_size: int = 256,
-        depth: int = 8,
+        depth: int = 0,
         num_iterations: int = 5000,
-        num_discr_iterations: int = 10,
+        num_discr_iterations: int = 1,
     ) -> None:
-        X = np.asarray(X)
-        Treatments = np.asarray(Treatments)
-        Y = np.asarray(Y)
+        super(Ganite, self).__init__()
 
-        if np.isnan(np.sum(X)):
+        X = self._check_tensor(X)
+        Treatments = self._check_tensor(Treatments)
+        Y = self._check_tensor(Y)
+
+        if np.isnan(np.sum(X.cpu().numpy())):
             raise ValueError("X contains NaNs")
         if len(X) != len(Treatments):
             raise ValueError("Features/Treatments mismatch")
@@ -177,7 +201,7 @@ class Ganite:
         enable_reproducible_results()
 
         dim_in = X.shape[1]
-        self.original_treatments = np.sort(np.unique(Treatments))
+        self.original_treatments = np.sort(np.unique(Treatments.cpu().numpy()))
         self.treatments = [0, 1]
 
         if len(self.original_treatments) != 2:
@@ -191,27 +215,28 @@ class Ganite:
         self.num_iterations = num_iterations
         self.num_discr_iterations = num_discr_iterations
 
+        binary_y = len(np.unique(Y.cpu().numpy())) == 2
         # Layers
         self.counterfactual_generator = CounterfactualGenerator(
-            dim_in, len(self.treatments), dim_hidden, depth
-        )
+            dim_in, len(self.treatments), dim_hidden, depth, binary_y
+        ).to(DEVICE)
         self.counterfactual_discriminator = CounterfactualDiscriminator(
-            dim_in, self.treatments, dim_hidden, depth
-        )
+            dim_in, self.treatments, dim_hidden, depth, binary_y
+        ).to(DEVICE)
         self.inference_nets = InferenceNets(
-            dim_in, len(self.treatments), dim_hidden, depth
-        )
+            dim_in, len(self.treatments), dim_hidden, depth, binary_y
+        ).to(DEVICE)
 
         # Solvers
         self.DG_solver = torch.optim.Adam(
             list(self.counterfactual_generator.parameters())
             + list(self.counterfactual_discriminator.parameters()),
-            lr=1e-4,
-            eps=10e-8,
+            lr=1e-3,
+            eps=1e-8,
             weight_decay=1e-3,
         )
         self.I_solver = torch.optim.Adam(
-            self.inference_nets.parameters(), lr=1e-4, weight_decay=1e-3
+            self.inference_nets.parameters(), lr=1e-3, weight_decay=1e-3
         )
 
         self._fit(X, Treatments, Y)
@@ -229,13 +254,13 @@ class Ganite:
 
     def _fit(
         self,
-        X: pd.DataFrame,
-        Treatment: pd.DataFrame,
-        Y: pd.DataFrame,
+        X: torch.Tensor,
+        Treatment: torch.Tensor,
+        Y: torch.Tensor,
     ) -> "Ganite":
-        Train_X = torch.from_numpy(X).float()
-        Train_T = torch.from_numpy(Treatment).float().reshape([-1, 1])
-        Train_Y = torch.from_numpy(Y).float().reshape([-1, 1])
+        Train_X = self._check_tensor(X).float()
+        Train_T = self._check_tensor(Treatment).float().reshape([-1, 1])
+        Train_Y = self._check_tensor(Y).float().reshape([-1, 1])
         # Encode
         min_t_val = Train_T.min()
         Train_T = (Train_T > min_t_val).float()
@@ -273,12 +298,13 @@ class Ganite:
 
             G_loss_GAN = D_loss
 
-            gen_loss = torch.zeros(Y_mb.shape)
-
-            for idx, tidx in enumerate(self.treatments):
-                gen_loss += (T_mb == tidx).int() * Tilde[:, idx].reshape([-1, 1])
-
-            G_loss_R = torch.mean(nn.MSELoss()(Y_mb, gen_loss))
+            G_loss_R = torch.mean(
+                nn.MSELoss()(
+                    Y_mb,
+                    T_mb * Tilde[:, 1].reshape([-1, 1])
+                    + (1.0 - T_mb) * Tilde[:, 0].reshape([-1, 1]),
+                )
+            )
 
             G_loss = G_loss_R + self.alpha * G_loss_GAN
 
@@ -306,22 +332,18 @@ class Ganite:
             I_loss1: torch.Tensor = 0
             I_loss2: torch.Tensor = 0
 
-            for idx, tidx in enumerate(self.treatments):
-                I_loss1 += torch.mean(
-                    nn.MSELoss()(
-                        (T_mb == tidx).int() * Y_mb
-                        + (T_mb != tidx).int() * Tilde[:, idx].reshape([-1, 1]),
-                        hat[:, idx].reshape([-1, 1]),
-                    )
+            I_loss1 = torch.mean(
+                nn.MSELoss()(
+                    T_mb * Y_mb + (1 - T_mb) * Tilde[:, 1].reshape([-1, 1]),
+                    hat[:, 1].reshape([-1, 1]),
                 )
-            for idx, tidx in enumerate(self.treatments):
-                I_loss2 += torch.mean(
-                    nn.MSELoss()(
-                        (T_mb != tidx).int() * Y_mb
-                        + (T_mb == tidx).int() * Tilde[:, idx].reshape([-1, 1]),
-                        hat[:, idx].reshape([-1, 1]),
-                    )
+            )
+            I_loss2 = torch.mean(
+                nn.MSELoss()(
+                    (1 - T_mb) * Y_mb + T_mb * Tilde[:, 0].reshape([-1, 1]),
+                    hat[:, 0].reshape([-1, 1]),
                 )
+            )
             I_loss = I_loss1 + self.beta * I_loss2
 
             if it % 100 == 0:
@@ -332,9 +354,15 @@ class Ganite:
 
         return self
 
-    def predict(self, X: pd.DataFrame) -> pd.DataFrame:
+    def forward(self, X: torch.Tensor) -> torch.Tensor:
         with torch.no_grad():
-            X = torch.from_numpy(np.asarray(X)).float()
-            y_hat = self.inference_nets(X).detach().numpy()
+            X = self._check_tensor(X).float()
+            y_hat = self.inference_nets(X).detach()
 
-        return pd.DataFrame(y_hat[:, 1] - y_hat[:, 0])
+        return y_hat[:, 1] - y_hat[:, 0]
+
+    def _check_tensor(self, X: torch.Tensor) -> torch.Tensor:
+        if isinstance(X, torch.Tensor):
+            return X.to(DEVICE)
+        else:
+            return torch.from_numpy(np.asarray(X)).to(DEVICE)

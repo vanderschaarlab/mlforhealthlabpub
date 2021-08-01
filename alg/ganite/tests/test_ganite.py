@@ -32,18 +32,18 @@ def test_model_sanity() -> None:
     assert model.num_discr_iterations == 7
     assert model.num_iterations == 12
 
-    pred = model.predict(X_test).to_numpy()
+    pred = model(X_test).numpy()
 
     assert len(pred) == len(Y_test)
 
 
-@pytest.mark.parametrize("dataset, pehe_threshold", [("twins", 0.4), ("ihdp", 4.5)])
+@pytest.mark.parametrize("dataset, pehe_threshold", [("twins", 0.4), ("ihdp", 1.5)])
 def test_model_training(dataset: str, pehe_threshold: float) -> None:
     X_train, W_train, Y_train, Y_train_full, X_test, Y_test = load(dataset)
 
-    model = Ganite(X_train, W_train, Y_train, num_iterations=500)
+    model = Ganite(X_train, W_train, Y_train, num_iterations=1000)
 
-    pred = model.predict(X_test).to_numpy()
+    pred = model(X_test).cpu().numpy()
 
     pehe = sqrt_PEHE_with_diff(Y_test, pred)
     print(f"PEHE score for GANITE on {dataset} = {pehe}")

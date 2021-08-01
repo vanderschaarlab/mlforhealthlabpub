@@ -1,4 +1,4 @@
-google_drive_downloader
+googledrivedownloader
 GPy
 loguru
 matplotlib

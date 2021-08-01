@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
+
 from .network import download_if_needed
 
 np.random.seed(0)

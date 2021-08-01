@@ -42,7 +42,7 @@ class CounterfactualGenerator(nn.Module):
             ),  # Inputs: X + Treatment (1) + Factual Outcome (1) + Random Vector      (Z)
             nn.LeakyReLU(),
             *hidden,
-        )
+        ).to(DEVICE)
 
         self.binary_y = binary_y
         self.outs = []
@@ -52,20 +52,20 @@ class CounterfactualGenerator(nn.Module):
                     nn.Linear(DimHidden, DimHidden),
                     nn.LeakyReLU(),
                     nn.Linear(DimHidden, 1),
-                )
+                ).to(DEVICE)
             )
 
     def forward(
         self, x: torch.Tensor, t: torch.Tensor, y: torch.Tensor
     ) -> torch.Tensor:
-        inputs = torch.cat([x, t, y], dim=1)
+        inputs = torch.cat([x, t, y], dim=1).to(DEVICE)
 
         G_h2 = self.common(inputs)
 
         G_prob1 = self.outs[0](G_h2)
         G_prob2 = self.outs[1](G_h2)
 
-        G_prob = torch.cat([G_prob1, G_prob2], dim=1)
+        G_prob = torch.cat([G_prob1, G_prob2], dim=1).to(DEVICE)
 
         if self.binary_y:
             return torch.sigmoid(G_prob)
@@ -102,7 +102,7 @@ class CounterfactualDiscriminator(nn.Module):
             *hidden,
             nn.Linear(DimHidden, 1),
             nn.Sigmoid(),
-        )
+        ).to(DEVICE)
 
     def forward(
         self, x: torch.Tensor, t: torch.Tensor, y: torch.Tensor, hat_y: torch.Tensor
@@ -111,7 +111,7 @@ class CounterfactualDiscriminator(nn.Module):
         inp0 = (1.0 - t) * y + t * hat_y[:, 0].reshape([-1, 1])
         inp1 = t * y + (1.0 - t) * hat_y[:, 1].reshape([-1, 1])
 
-        inputs = torch.cat([x, inp0, inp1], dim=1)
+        inputs = torch.cat([x, inp0, inp1], dim=1).to(DEVICE)
         return self.model(inputs)
 
 
@@ -138,7 +138,7 @@ class InferenceNets(nn.Module):
             nn.Linear(Dim, DimHidden),
             nn.LeakyReLU(),
             *hidden,
-        )
+        ).to(DEVICE)
         self.binary_y = binary_y
 
         self.outs = []
@@ -148,7 +148,7 @@ class InferenceNets(nn.Module):
                     nn.Linear(DimHidden, DimHidden),
                     nn.LeakyReLU(),
                     nn.Linear(DimHidden, 1),
-                )
+                ).to(DEVICE)
             )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -159,9 +159,9 @@ class InferenceNets(nn.Module):
             I_probs.append(out(I_h))
 
         if self.binary_y:
-            return torch.sigmoid(torch.cat(I_probs, dim=1))
+            return torch.sigmoid(torch.cat(I_probs, dim=1).to(DEVICE))
         else:
-            return torch.cat(I_probs, dim=1)
+            return torch.cat(I_probs, dim=1).to(DEVICE)
 
 
 class Ganite(nn.Module):

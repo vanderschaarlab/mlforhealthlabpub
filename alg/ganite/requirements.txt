@@ -1,6 +1,8 @@
+google_drive_downloader
 loguru
 numpy
 pandas
+requests
 scikit_learn
 scipy
 torch

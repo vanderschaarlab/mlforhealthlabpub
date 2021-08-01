@@ -1,7 +1,9 @@
+google_drive_downloader
 GPy
 loguru
 matplotlib
 numpy
 pandas
+requests
 scikit_learn
 scipy

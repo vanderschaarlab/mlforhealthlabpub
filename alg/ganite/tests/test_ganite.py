@@ -43,7 +43,7 @@ def test_model_training(dataset: str, pehe_threshold: float) -> None:
 
     model = Ganite(X_train, W_train, Y_train, num_iterations=1000)
 
-    pred = model(X_test).numpy()
+    pred = model(X_test).cpu().numpy()
 
     pehe = sqrt_PEHE_with_diff(Y_test, pred)
     print(f"PEHE score for GANITE on {dataset} = {pehe}")

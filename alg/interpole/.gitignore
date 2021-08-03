@@ -1,0 +1,10 @@
+temp/
+
+pomdp/**
+!pomdp/.keep
+
+res/**
+!res/adni/.keep
+
+data/**
+!data/.keep

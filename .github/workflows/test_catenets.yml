@@ -59,4 +59,4 @@ jobs:
             pip install -r requirements_dev.txt
             pip install .
       - name: Test with pytest
-        run: pytest -vvvsx
+        run: pytest -vvvsx -m "not slow"

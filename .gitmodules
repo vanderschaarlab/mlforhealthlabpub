@@ -4,3 +4,6 @@
 [submodule "ts-data"]
 	path = alg/compartmental_gp/ts-data
 	url = https://github.com/CSSEGISandData/COVID-19.git
+[submodule "alg/CATENets"]
+	path = alg/CATENets
+	url = https://github.com/vanderschaarlab/CATENets

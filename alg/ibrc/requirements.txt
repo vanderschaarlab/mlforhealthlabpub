@@ -1,0 +1,7 @@
+dill==0.3.2
+jax==0.2.8
+jaxlib==0.1.58
+matplotlib==3.3.0
+numpy==1.19.0
+pandas==1.0.5
+scipy==1.5.1

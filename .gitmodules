@@ -7,3 +7,6 @@
 [submodule "alg/CATENets"]
 	path = alg/CATENets
 	url = https://github.com/vanderschaarlab/CATENets
+[submodule "alg/Fourier-flows"]
+	path = alg/Fourier-flows
+	url = https://github.com/vanderschaarlab/Fourier-flows

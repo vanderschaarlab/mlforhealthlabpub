@@ -63,9 +63,13 @@ Estimating the Effects of Continuous-valued Interventions using Generative Adver
 Learning outside the Black-Box: The pursuit of interpretable models [[Link]](https://arxiv.org/abs/2011.08596) | NeurIPS 2020 | [alg/Symbolic-Pursuit](alg/Symbolic-Pursuit)
 VIME: Extending the Success of Self- and Semi-supervised Learning to Tabular Domain [[Link]](https://papers.nips.cc/paper/2020/hash/7d97667a3e056acab9aaf653807b4a03-Abstract.html) | NeurIPS 2020 | [alg/vime](alg/vime)
 Scalable Bayesian Inverse Reinforcement Learning [[Link]](https://openreview.net/pdf?id=4qR3coiNaIv) | ICLR 2021 | [alg/scalable-birl](alg/scalable-birl)
-Nonparametric Estimation of Heterogeneous Treatment Effects: From Theory to Learning Algorithms [[Link]](https://arxiv.org/abs/2101.10943) | AISTATS 2021 | [alg/CATENets](alg/CATENets)
+Nonparametric Estimation of Heterogeneous Treatment Effects: From Theory to Learning Algorithms [[Link]](https://arxiv.org/abs/2101.10943) | AISTATS 2021 | [alg/CATENets](https://github.com/vanderschaarlab/CATENets)
 Learning Matching Representations for Individualized Organ Transplantation Allocation [[Link]](https://arxiv.org/abs/2101.11769) | AISTATS 2021| [alg/MatchingRep](alg/MatchingRep)
 Explaining by Imitating: Understanding Decisions by Interpretable Policy Learning [[Link]](https://openreview.net/forum?id=unI5ucw_Jk) | ICLR 2021 | [alg/interpole](alg/interpole)
+Inverse Decision Modeling: Learning Interpretable Representations of Behavior [[Link]](http://proceedings.mlr.press/v139/jarrett21a.html) | ICML 2021 | [alg/ibrc](alg/ibrc)
+Policy Analysis using Synthetic Controls in Continuous-Time [[Link]](http://proceedings.mlr.press/v139/bellot21a/bellot21a.pdf) | ICML 2021 | [alg/Synthetic-Controls-in-Continuous-Time](https://github.com/vanderschaarlab/Synthetic-Controls-in-Continuous-Time/)
+Learning Queueing Policies for Organ Transplantation Allocation using Interpretable Counterfactual Survival Analysis [[Link]](http://proceedings.mlr.press/v139/berrevoets21a/berrevoets21a.pdf) | ICML 2021 | [alg/organsync](https://github.com/vanderschaarlab/organsync/)
+Generative Time-series Modeling with Fourier Flows [[Link]](https://openreview.net/forum?id=PpshD0AXfA) | ICLR 2021 | [alg/Fourier-flows](https://github.com/vanderschaarlab/Fourier-flows/)
 <br/>
 
 Details of apps and other software is listed below:
@@ -78,6 +82,20 @@ Hide-and-Seek Privacy Challenge [[Link]](http://www.vanderschaar-lab.com/privacy
 
 ## Citations
 Please cite the *the applicable papers* and [van der Schaar Lab repository](https://github.com/vanderschaarlab/mlforhealthlabpub/) if you use the software.
+
+## Breakdown by category
+
+**Synthetic data**
+
+* [alg/pategan](alg/pategan)
+* [alg/adsgan](alg/adsgan)
+* [alg/dpbag](alg/dpbag)
+* [alg/timegan](alg/timegan)
+* [alg/Fourier-flows](https://github.com/vanderschaarlab/Fourier-flows/)
+
+**More categories to come**
+
+* 🚧
 
 ## License
 Copyright **2019-2021** van der Schaar Lab.

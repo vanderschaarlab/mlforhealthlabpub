@@ -70,6 +70,11 @@ Inverse Decision Modeling: Learning Interpretable Representations of Behavior [[
 Policy Analysis using Synthetic Controls in Continuous-Time [[Link]](http://proceedings.mlr.press/v139/bellot21a/bellot21a.pdf) | ICML 2021 | [alg/Synthetic-Controls-in-Continuous-Time](https://github.com/vanderschaarlab/Synthetic-Controls-in-Continuous-Time/)
 Learning Queueing Policies for Organ Transplantation Allocation using Interpretable Counterfactual Survival Analysis [[Link]](http://proceedings.mlr.press/v139/berrevoets21a/berrevoets21a.pdf) | ICML 2021 | [alg/organsync](https://github.com/vanderschaarlab/organsync/)
 Generative Time-series Modeling with Fourier Flows [[Link]](https://openreview.net/forum?id=PpshD0AXfA) | ICLR 2021 | [alg/Fourier-flows](https://github.com/vanderschaarlab/Fourier-flows/)
+On Inductive Biases for Heterogeneous Treatment Effect Estimation [[Link]](https://arxiv.org/pdf/2106.03765.pdf) | NeurIPS 2021 | [alg/CATENets](https://github.com/vanderschaarlab/CATENets/)
+Really Doing Great at Estimating CATE? A Critical Look at ML Benchmarking Practices in Treatment Effect Estimation [[Link]](https://openreview.net/pdf?id=FQLzQqGEAH) | NeurIPS 2021 | [alg/CATENets](https://github.com/vanderschaarlab/CATENets/)
+The Medkit-Learn(ing) Environment: Medical Decision Modelling through Simulation [[Link]](https://arxiv.org/abs/2106.04240) | NeurIPS 2021 | [alg/medkit-learn](https://github.com/vanderschaarlab/medkit-learn)
+MIRACLE: Causally-Aware Imputation via Learning Missing Data Mechanisms [[Link]](https://neurips.cc/Conferences/2021/ScheduleMultitrack?event=27670) | NeurIPS 2021 | [alg/MIRACLE](https://github.com/vanderschaarlab/MIRACLE)
+DECAF: Generating Fair Synthetic Data Using Causally-Aware Generative Networks [[Link]](https://neurips.cc/Conferences/2021/ScheduleMultitrack?event=27552) | NeurIPS 2021 | [alg/DECAF](https://github.com/vanderschaarlab/DECAF)
 <br/>
 
 Details of apps and other software is listed below:

@@ -10,3 +10,12 @@
 [submodule "alg/Fourier-flows"]
 	path = alg/Fourier-flows
 	url = https://github.com/vanderschaarlab/Fourier-flows
+[submodule "alg/DECAF"]
+	path = alg/DECAF
+	url = https://github.com/vanderschaarlab/DECAF
+[submodule "alg/MIRACLE"]
+	path = alg/MIRACLE
+	url = https://github.com/vanderschaarlab/MIRACLE
+[submodule "alg/medkit-learn"]
+	path = alg/medkit-learn
+	url = https://github.com/vanderschaarlab/medkit-learn

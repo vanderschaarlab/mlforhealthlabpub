@@ -7,21 +7,6 @@
 [submodule "alg/CATENets"]
 	path = alg/CATENets
 	url = https://github.com/vanderschaarlab/CATENets
-[submodule "alg/Synthetic-Controls-in-Continuous-Time"]
-	path = alg/Synthetic-Controls-in-Continuous-Time
-	url = git@github.com:vanderschaarlab/Synthetic-Controls-in-Continuous-Time.git
-[submodule "alg/organsync"]
-	path = alg/organsync
-	url = git@github.com:vanderschaarlab/organsync.git
 [submodule "alg/Fourier-flows"]
 	path = alg/Fourier-flows
 	url = https://github.com/vanderschaarlab/Fourier-flows
-[submodule "alg/medkit-learn"]
-	path = alg/medkit-learn
-	url = git@github.com:vanderschaarlab/medkit-learn.git
-[submodule "alg/DECAF"]
-	path = alg/DECAF
-	url = git@github.com:vanderschaarlab/DECAF.git
-[submodule "alg/MIRACLE"]
-	path = alg/MIRACLE
-	url = git@github.com:vanderschaarlab/MIRACLE.git

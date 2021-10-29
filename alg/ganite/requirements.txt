@@ -1,0 +1,8 @@
+googledrivedownloader
+loguru
+numpy
+pandas
+requests
+scikit_learn
+scipy
+torch

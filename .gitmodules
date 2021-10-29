@@ -16,21 +16,15 @@
 [submodule "alg/Fourier-flows"]
 	path = alg/Fourier-flows
 	url = https://github.com/vanderschaarlab/Fourier-flows
-[submodule "alg/medkit-learn"]
-	path = alg/medkit-learn
-	url = git@github.com:vanderschaarlab/medkit-learn.git
 [submodule "alg/DECAF"]
 	path = alg/DECAF
-	url = git@github.com:vanderschaarlab/DECAF.git
+	url = https://github.com/vanderschaarlab/DECAF
 [submodule "alg/MIRACLE"]
 	path = alg/MIRACLE
-	url = git@github.com:vanderschaarlab/MIRACLE.git
-[submodule "alg/iTransplant"]
-	path = alg/iTransplant
-	url = git@github.com:vanderschaarlab/iTransplant.git
+	url = https://github.com/vanderschaarlab/MIRACLE
+[submodule "alg/medkit-learn"]
+	path = alg/medkit-learn
+	url = https://github.com/vanderschaarlab/medkit-learn
 [submodule "alg/Simplex"]
 	path = alg/Simplex
-	url = git@github.com:vanderschaarlab/Simplex.git
-[submodule "alg/--force"]
-	path = alg/--force
-	url = git@github.com:vanderschaarlab/Simplex.git
+	url = https://github.com/vanderschaarlab/Simplex

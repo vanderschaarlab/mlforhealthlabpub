@@ -1,4 +1,4 @@
-name: CATENets Package release
+name: CMGP Package release
 
 on:
   release:
@@ -6,14 +6,14 @@ on:
 
 defaults:
   run:
-    working-directory: alg/CATENets
+    working-directory: alg/causal_multitask_gaussian_processes_ite
 
 jobs:
   deploy_osx:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: [3.6, 3.7, 3.8, 3.9]
+        python-version: [3.7, 3.8, 3.9]
         os: [macos-latest]
 
     steps:
@@ -34,7 +34,6 @@ jobs:
     strategy:
       matrix:
         python-version:
-          - cp36-cp36m
           - cp37-cp37m
           - cp38-cp38
           - cp39-cp39
@@ -53,3 +52,22 @@ jobs:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: ${GITHUB_WORKSPACE}/.github/workflows/scripts/release_linux.sh
+
+  deploy_windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          ../../.github/workflows/scripts/release_windows.bat

@@ -75,6 +75,9 @@ Really Doing Great at Estimating CATE? A Critical Look at ML Benchmarking Practi
 The Medkit-Learn(ing) Environment: Medical Decision Modelling through Simulation [[Link]](https://arxiv.org/abs/2106.04240) | NeurIPS 2021 | [alg/medkit-learn](https://github.com/vanderschaarlab/medkit-learn)
 MIRACLE: Causally-Aware Imputation via Learning Missing Data Mechanisms [[Link]](https://neurips.cc/Conferences/2021/ScheduleMultitrack?event=27670) | NeurIPS 2021 | [alg/MIRACLE](https://github.com/vanderschaarlab/MIRACLE)
 DECAF: Generating Fair Synthetic Data Using Causally-Aware Generative Networks [[Link]](https://neurips.cc/Conferences/2021/ScheduleMultitrack?event=27552) | NeurIPS 2021 | [alg/DECAF](https://github.com/vanderschaarlab/DECAF)
+Explaining Latent Representations with a Corpus of Examples [[Link]](https://arxiv.org/abs/2110.15355) | NeurIPS 2021 | [alg/Simplex](https://github.com/vanderschaarlab/Simplex)
+Closing the loop in medical decision support by understanding clinical decision-making: A case study on organ transplantation [[Link]](https://neurips.cc/Conferences/2021/ScheduleMultitrack?event=26815) | NeurIPS 2021 | [alg/iTransplant](https://github.com/vanderschaarlab/iTransplant)
+
 <br/>
 
 Details of apps and other software is listed below:

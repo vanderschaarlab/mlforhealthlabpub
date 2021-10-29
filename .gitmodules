@@ -25,3 +25,12 @@
 [submodule "alg/MIRACLE"]
 	path = alg/MIRACLE
 	url = git@github.com:vanderschaarlab/MIRACLE.git
+[submodule "alg/iTransplant"]
+	path = alg/iTransplant
+	url = git@github.com:vanderschaarlab/iTransplant.git
+[submodule "alg/Simplex"]
+	path = alg/Simplex
+	url = git@github.com:vanderschaarlab/Simplex.git
+[submodule "alg/--force"]
+	path = alg/--force
+	url = git@github.com:vanderschaarlab/Simplex.git

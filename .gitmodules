@@ -19,3 +19,9 @@
 [submodule "alg/medkit-learn"]
 	path = alg/medkit-learn
 	url = https://github.com/vanderschaarlab/medkit-learn
+[submodule "alg/iTransplant"]
+	path = alg/iTransplant
+	url = https://github.com/vanderschaarlab/iTransplant
+[submodule "alg/Simplex"]
+	path = alg/Simplex
+	url = https://github.com/vanderschaarlab/Simplex

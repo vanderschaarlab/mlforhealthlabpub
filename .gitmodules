@@ -28,3 +28,6 @@
 [submodule "alg/Simplex"]
 	path = alg/Simplex
 	url = https://github.com/vanderschaarlab/Simplex
+[submodule "alg/Dynamask"]
+	path = alg/Dynamask
+	url = https://github.com/vanderschaarlab/Dynamask

@@ -31,3 +31,6 @@
 [submodule "alg/Dynamask"]
 	path = alg/Dynamask
 	url = https://github.com/vanderschaarlab/Dynamask
+[submodule "alg/Hybrid-ODE-NeurIPS-2021"]
+	path = alg/Hybrid-ODE-NeurIPS-2021
+	url = https://github.com/vanderschaarlab/Hybrid-ODE-NeurIPS-2021

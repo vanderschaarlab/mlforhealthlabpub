@@ -34,3 +34,6 @@
 [submodule "alg/Hybrid-ODE-NeurIPS-2021"]
 	path = alg/Hybrid-ODE-NeurIPS-2021
 	url = https://github.com/vanderschaarlab/Hybrid-ODE-NeurIPS-2021
+[submodule "alg/SyncTwin-NeurIPS-2021"]
+	path = alg/SyncTwin-NeurIPS-2021
+	url = https://github.com/vanderschaarlab/SyncTwin-NeurIPS-2021.git

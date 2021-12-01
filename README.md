@@ -79,6 +79,7 @@ DECAF: Generating Fair Synthetic Data Using Causally-Aware Generative Networks [
 Explaining Latent Representations with a Corpus of Examples [[Link]](https://arxiv.org/abs/2110.15355) | NeurIPS 2021 | [alg/Simplex](https://github.com/vanderschaarlab/Simplex)
 Closing the loop in medical decision support by understanding clinical decision-making: A case study on organ transplantation [[Link]](https://neurips.cc/Conferences/2021/ScheduleMultitrack?event=26815) | NeurIPS 2021 | [alg/iTransplant](https://github.com/vanderschaarlab/iTransplant)
 Integrating Expert ODEs into Neural ODEs: Pharmacology and Disease Progression [[Link]](https://papers.neurips.cc/paper/2021/hash/5ea1649a31336092c05438df996a3e59-Abstract.html) | NeurIPS 2021 | [alg/Hybrid-ODE-NeurIPS-2021](https://github.com/vanderschaarlab/Hybrid-ODE-NeurIPS-2021)
+SyncTwin: Treatment Effect Estimation with Longitudinal Outcomes [[Link]](https://proceedings.neurips.cc/paper/2021/hash/19485224d128528da1602ca47383f078-Abstract.html) | NeurIPS 2021 | [alg/SyncTwin-NeurIPS-2021](https://github.com/vanderschaarlab/SyncTwin-NeurIPS-2021)
 
 <br/>
 

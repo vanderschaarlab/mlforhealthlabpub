@@ -37,3 +37,6 @@
 [submodule "alg/SyncTwin-NeurIPS-2021"]
 	path = alg/SyncTwin-NeurIPS-2021
 	url = https://github.com/vanderschaarlab/SyncTwin-NeurIPS-2021.git
+[submodule "alg/conformal-rnn"]
+	path = alg/conformal-rnn
+	url = https://github.com/vanderschaarlab/conformal-rnn.git

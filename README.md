@@ -69,6 +69,7 @@ Explaining by Imitating: Understanding Decisions by Interpretable Policy Learnin
 Inverse Decision Modeling: Learning Interpretable Representations of Behavior [[Link]](http://proceedings.mlr.press/v139/jarrett21a.html) | ICML 2021 | [alg/ibrc](alg/ibrc)
 Policy Analysis using Synthetic Controls in Continuous-Time [[Link]](http://proceedings.mlr.press/v139/bellot21a/bellot21a.pdf) | ICML 2021 | [alg/Synthetic-Controls-in-Continuous-Time](https://github.com/vanderschaarlab/Synthetic-Controls-in-Continuous-Time/)
 Learning Queueing Policies for Organ Transplantation Allocation using Interpretable Counterfactual Survival Analysis [[Link]](http://proceedings.mlr.press/v139/berrevoets21a/berrevoets21a.pdf) | ICML 2021 | [alg/organsync](https://github.com/vanderschaarlab/organsync/)
+Explaining Time Series Predictions with Dynamic Masks [[Link]](http://proceedings.mlr.press/v139/crabbe21a.html) | ICML 2021 | [alg/Dynamask](https://github.com/vanderschaarlab/Dynamask/)
 Generative Time-series Modeling with Fourier Flows [[Link]](https://openreview.net/forum?id=PpshD0AXfA) | ICLR 2021 | [alg/Fourier-flows](https://github.com/vanderschaarlab/Fourier-flows/)
 On Inductive Biases for Heterogeneous Treatment Effect Estimation [[Link]](https://arxiv.org/pdf/2106.03765.pdf) | NeurIPS 2021 | [alg/CATENets](https://github.com/vanderschaarlab/CATENets/)
 Really Doing Great at Estimating CATE? A Critical Look at ML Benchmarking Practices in Treatment Effect Estimation [[Link]](https://openreview.net/pdf?id=FQLzQqGEAH) | NeurIPS 2021 | [alg/CATENets](https://github.com/vanderschaarlab/CATENets/)
@@ -77,6 +78,9 @@ MIRACLE: Causally-Aware Imputation via Learning Missing Data Mechanisms [[Link]]
 DECAF: Generating Fair Synthetic Data Using Causally-Aware Generative Networks [[Link]](https://neurips.cc/Conferences/2021/ScheduleMultitrack?event=27552) | NeurIPS 2021 | [alg/DECAF](https://github.com/vanderschaarlab/DECAF)
 Explaining Latent Representations with a Corpus of Examples [[Link]](https://arxiv.org/abs/2110.15355) | NeurIPS 2021 | [alg/Simplex](https://github.com/vanderschaarlab/Simplex)
 Closing the loop in medical decision support by understanding clinical decision-making: A case study on organ transplantation [[Link]](https://neurips.cc/Conferences/2021/ScheduleMultitrack?event=26815) | NeurIPS 2021 | [alg/iTransplant](https://github.com/vanderschaarlab/iTransplant)
+Integrating Expert ODEs into Neural ODEs: Pharmacology and Disease Progression [[Link]](https://papers.neurips.cc/paper/2021/hash/5ea1649a31336092c05438df996a3e59-Abstract.html) | NeurIPS 2021 | [alg/Hybrid-ODE-NeurIPS-2021](https://github.com/vanderschaarlab/Hybrid-ODE-NeurIPS-2021)
+SyncTwin: Treatment Effect Estimation with Longitudinal Outcomes [[Link]](https://proceedings.neurips.cc/paper/2021/hash/19485224d128528da1602ca47383f078-Abstract.html) | NeurIPS 2021 | [alg/SyncTwin-NeurIPS-2021](https://github.com/vanderschaarlab/SyncTwin-NeurIPS-2021)
+Conformal Time-series Forecasting [[Link]](https://proceedings.neurips.cc/paper/2021/hash/312f1ba2a72318edaaa995a67835fad5-Abstract.html) | NeurIPS 2021 | [alg/conformal-rnn](https://github.com/vanderschaarlab/conformal-rnn/tree/master)
 
 <br/>
 

@@ -103,3 +103,6 @@ ENV/
 # Custom
 .Rhistory
 .vscode/
+
+.DS_Store
+*.obj

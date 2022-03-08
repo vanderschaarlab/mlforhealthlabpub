@@ -49,3 +49,6 @@
 [submodule "alg/lori"]
 	path = alg/lori
 	url = https://github.com/vanderschaarlab/lori.git
+[submodule "alg/inverse-online"]
+	path = alg/inverse-online
+	url = https://github.com/vanderschaarlab/inverse-online.git

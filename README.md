@@ -82,6 +82,10 @@ Integrating Expert ODEs into Neural ODEs: Pharmacology and Disease Progression [
 SyncTwin: Treatment Effect Estimation with Longitudinal Outcomes [[Link]](https://proceedings.neurips.cc/paper/2021/hash/19485224d128528da1602ca47383f078-Abstract.html) | NeurIPS 2021 | [alg/SyncTwin-NeurIPS-2021](https://github.com/vanderschaarlab/SyncTwin-NeurIPS-2021)
 Conformal Time-series Forecasting [[Link]](https://proceedings.neurips.cc/paper/2021/hash/312f1ba2a72318edaaa995a67835fad5-Abstract.html) | NeurIPS 2021 | [alg/conformal-rnn](https://github.com/vanderschaarlab/conformal-rnn/tree/master)
 Estimating Multi-cause Treatment Effects via Single-cause Perturbation [[Link]](https://proceedings.neurips.cc/paper/2021/hash/c793b3be8f18731f2a4c627fb3c6c63d-Abstract.html) | NeurIPS 2021 | [alg/Single-Cause-Perturbation-NeurIPS-2021](https://github.com/vanderschaarlab/Single-Cause-Perturbation-NeurIPS-2021/)
+Invariant Causal Imitation Learning for Generalizable Policies [[Link]](https://papers.nips.cc/paper/2021/file/204904e461002b28511d5880e1c36a0f-Paper.pdf) | NeurIPS 2021 | [alg/Invariant-Causal-Imitation-Learning](https://github.com/vanderschaarlab/Invariant-Causal-Imitation-Learning/tree/main)
+Inferring Lexicographically-Ordered Rewards from Preferences | AAAI 2022 | [alg/lori](https://github.com/vanderschaarlab/lori)
+Inverse Online Learning: Understanding Non-Stationary and Reactionary Policies | ICLR 2022 | [alg/inverse-online](https://github.com/vanderschaarlab/inverse-online)
+D-CODE: Discovering Closed-form ODEs from Observed Trajectories | ICLR 2022 | [alg/D-CODE-ICLR-2022](https://github.com/vanderschaarlab/D-CODE-ICLR-2022)
 
 <br/>
 

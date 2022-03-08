@@ -43,3 +43,15 @@
 [submodule "alg/Single-Cause-Perturbation-NeurIPS-2021"]
 	path = alg/Single-Cause-Perturbation-NeurIPS-2021
 	url = https://github.com/vanderschaarlab/Single-Cause-Perturbation-NeurIPS-2021
+[submodule "alg/Invariant-Causal-Imitation-Learning"]
+	path = alg/Invariant-Causal-Imitation-Learning
+	url = https://github.com/vanderschaarlab/Invariant-Causal-Imitation-Learning.git
+[submodule "alg/lori"]
+	path = alg/lori
+	url = https://github.com/vanderschaarlab/lori.git
+[submodule "alg/inverse-online"]
+	path = alg/inverse-online
+	url = https://github.com/vanderschaarlab/inverse-online.git
+[submodule "alg/D-CODE-ICLR-2022"]
+	path = alg/D-CODE-ICLR-2022
+	url = https://github.com/vanderschaarlab/D-CODE-ICLR-2022.git

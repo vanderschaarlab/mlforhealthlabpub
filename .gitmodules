@@ -46,3 +46,6 @@
 [submodule "alg/Invariant-Causal-Imitation-Learning"]
 	path = alg/Invariant-Causal-Imitation-Learning
 	url = https://github.com/vanderschaarlab/Invariant-Causal-Imitation-Learning.git
+[submodule "alg/lori"]
+	path = alg/lori
+	url = https://github.com/vanderschaarlab/lori.git

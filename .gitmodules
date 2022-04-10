@@ -55,3 +55,6 @@
 [submodule "alg/D-CODE-ICLR-2022"]
 	path = alg/D-CODE-ICLR-2022
 	url = https://github.com/vanderschaarlab/D-CODE-ICLR-2022.git
+[submodule "alg/Graphical-modelling-continuous-time"]
+	path = alg/Graphical-modelling-continuous-time
+	url = https://github.com/vanderschaarlab/Graphical-modelling-continuous-time

@@ -87,6 +87,8 @@ Inferring Lexicographically-Ordered Rewards from Preferences | AAAI 2022 | [alg/
 Inverse Online Learning: Understanding Non-Stationary and Reactionary Policies | ICLR 2022 | [alg/inverse-online](https://github.com/vanderschaarlab/inverse-online)
 D-CODE: Discovering Closed-form ODEs from Observed Trajectories | ICLR 2022 | [alg/D-CODE-ICLR-2022](https://github.com/vanderschaarlab/D-CODE-ICLR-2022)
 Neural graphical modelling in continuous-time: consistency guarantees and algorithms | ICLR 2022 | [alg/Graphical-modelling-continuous-time](https://github.com/vanderschaarlab/Graphical-modelling-continuous-time)
+Label-Free Explainability for Unsupervised Models | ICML 2022 | [alg/Label-Free-XAI](https://github.com/vanderschaarlab/Label-Free-XAI)
+Inverse Contextual Bandits: Learning How Behavior Evolves over Time | ICML 2022 | [alg/invconban](https://github.com/vanderschaarlab/invconban)
 
 <br/>
 

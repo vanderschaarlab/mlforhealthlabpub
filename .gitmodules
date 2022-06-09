@@ -58,3 +58,12 @@
 [submodule "alg/Graphical-modelling-continuous-time"]
 	path = alg/Graphical-modelling-continuous-time
 	url = https://github.com/vanderschaarlab/Graphical-modelling-continuous-time
+[submodule "alg/Label-Free-XAI"]
+	path = alg/Label-Free-XAI
+	url = https://github.com/vanderschaarlab/Label-Free-XAI
+[submodule "alg/invconban"]
+	path = alg/invconban
+	url = https://github.com/vanderschaarlab/invconban
+[submodule "alg/Symbolic-Pursuit"]
+	path = alg/Symbolic-Pursuit
+	url = git@github.com:vanderschaarlab/Symbolic-Pursuit.git

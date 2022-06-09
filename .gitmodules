@@ -64,3 +64,6 @@
 [submodule "alg/invconban"]
 	path = alg/invconban
 	url = https://github.com/vanderschaarlab/invconban
+[submodule "alg/Symbolic-Pursuit"]
+	path = alg/Symbolic-Pursuit
+	url = git@github.com:vanderschaarlab/Symbolic-Pursuit.git

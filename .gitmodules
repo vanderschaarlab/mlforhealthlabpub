@@ -67,3 +67,6 @@
 [submodule "alg/Symbolic-Pursuit"]
 	path = alg/Symbolic-Pursuit
 	url = git@github.com:vanderschaarlab/Symbolic-Pursuit.git
+[submodule "alg/Data-SUITE"]
+	path = alg/Data-SUITE
+	url = https://github.com/vanderschaarlab/Data-SUITE

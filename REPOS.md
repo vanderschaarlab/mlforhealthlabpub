@@ -50,7 +50,7 @@ Explaining by Imitating: Understanding Decisions by Interpretable Policy Learnin
 Inverse Decision Modeling: Learning Interpretable Representations of Behavior | ICML 2021 | `alg/ibrc` | `N/A`
 Policy Analysis using Synthetic Controls in Continuous-Time | ICML 2021 | `alg/Synthetic-Controls-in-Continuous-Time` | https://github.com/alexisbellot/Synthetic-Controls-in-Continuous-Time
 Learning Queueing Policies for Organ Transplantation Allocation using Interpretable Counterfactual Survival Analysis | ICML 2021 | `alg/organsync` | https://github.com/jeroenbe/organsync
-Explaining Time Series Predictions with Dynamic Masks | ICML 2021 | [alg/Dynamask](https://github.com/JonathanCrabbe/Dynamask/)
+Explaining Time Series Predictions with Dynamic Masks | ICML 2021 | `alg/Dynamask` |https://github.com/JonathanCrabbe/Dynamask/
 Generative Time-series Modeling with Fourier Flows | ICLR 2021 | `alg/Fourier-flows` | https://github.com/ahmedmalaa/Fourier-flows
 On Inductive Biases for Heterogeneous Treatment Effect Estimation | NeurIPS 2021 | `alg/CATENets` | https://github.com/AliciaCurth/CATENets
 The Medkit-Learn(ing) Environment: Medical Decision Modelling through Simulation | NeurIPS 2021 | `alg/medkit-learn` | https://github.com/XanderJC/medkit-learn
@@ -58,16 +58,16 @@ MIRACLE: Causally-Aware Imputation via Learning Missing Data Mechanisms | NeurIP
 DECAF: Generating Fair Synthetic Data Using Causally-Aware Generative Networks | NeurIPS 2021 | `alg/DECAF` | https://github.com/trentkyono/DECAF
 Explaining Latent Representations with a Corpus of Examples | NeurIPS 2021 | `alg/Simplex` | https://github.com/JonathanCrabbe/Simplex
 Closing the loop in medical decision support by understanding clinical decision-making: A case study on organ transplantation | NeurIPS 2021 | `alg/iTransplant` | https://github.com/yvchao/iTransplan
-Integrating Expert ODEs into Neural ODEs: Pharmacology and Disease Progression | NeurIPS 2021 | [alg/Hybrid-ODE-NeurIPS-2021](https://github.com/ZhaozhiQIAN/Hybrid-ODE-NeurIPS-2021)
-SyncTwin: Treatment Effect Estimation with Longitudinal Outcomes | NeurIPS 2021 | [alg/SyncTwin-NeurIPS-2021](https://github.com/ZhaozhiQIAN/SyncTwin-NeurIPS-2021)
-Conformal Time-series Forecasting | NeurIPS 2021 | [alg/conformal-rnn](https://github.com/kamilest/conformal-rnn)
-Estimating Multi-cause Treatment Effects via Single-cause Perturbation | NeurIPS 2021 | [alg/Single-Cause-Perturbation-NeurIPS-2021](https://github.com/ZhaozhiQIAN/Single-Cause-Perturbation-NeurIPS-2021)
-Invariant Causal Imitation Learning for Generalizable Policies | NeurIPS 2021 | [alg/Invariant-Causal-Imitation-Learning](https://github.com/ioanabica/Invariant-Causal-Imitation-Learning.git)
-Inferring Lexicographically-Ordered Rewards from Preferences | AAAI 2022 | [alg/lori](https://github.com/vanderschaarlab/lori)
-Inverse Online Learning: Understanding Non-Stationary and Reactionary Policies | ICLR 2022 | [alg/inverse-online](https://github.com/vanderschaarlab/inverse-online)
-D-CODE: Discovering Closed-form ODEs from Observed Trajectories | ICLR 2022 | [alg/D-CODE-ICLR-2022](https://github.com/vanderschaarlab/D-CODE-ICLR-2022)
-Neural graphical modelling in continuous-time: consistency guarantees and algorithms | ICLR 2022 | [alg/Graphical-modelling-continuous-time](https://github.com/alexisbellot/Graphical-modelling-continuous-time)
-Label-Free Explainability for Unsupervised Models | ICML 2022 | [alg/Label-Free-XAI](https://github.com/vanderschaarlab/Label-Free-XAI)
-Inverse Contextual Bandits: Learning How Behavior Evolves over Time | ICML 2022 | [alg/invconban](https://github.com/vanderschaarlab/invconban)
-
-
+Integrating Expert ODEs into Neural ODEs: Pharmacology and Disease Progression | NeurIPS 2021 | `alg/Hybrid-ODE-NeurIPS-2021` | https://github.com/ZhaozhiQIAN/Hybrid-ODE-NeurIPS-2021
+SyncTwin: Treatment Effect Estimation with Longitudinal Outcomes | NeurIPS 2021 | `alg/SyncTwin-NeurIPS-2021` | https://github.com/ZhaozhiQIAN/SyncTwin-NeurIPS-2021
+Conformal Time-series Forecasting | NeurIPS 2021 | `alg/conformal-rnn` | https://github.com/kamilest/conformal-rnn
+Estimating Multi-cause Treatment Effects via Single-cause Perturbation | NeurIPS 2021 | `alg/Single-Cause-Perturbation-NeurIPS-2021` | https://github.com/ZhaozhiQIAN/Single-Cause-Perturbation-NeurIPS-2021
+Invariant Causal Imitation Learning for Generalizable Policies | NeurIPS 2021 | `alg/Invariant-Causal-Imitation-Learning` | https://github.com/ioanabica/Invariant-Causal-Imitation-Learning.git
+Inferring Lexicographically-Ordered Rewards from Preferences | AAAI 2022 | `alg/lori` | https://github.com/vanderschaarlab/lori
+Inverse Online Learning: Understanding Non-Stationary and Reactionary Policies | ICLR 2022 | `alg/inverse-online` | https://github.com/vanderschaarlab/inverse-online
+D-CODE: Discovering Closed-form ODEs from Observed Trajectories | ICLR 2022 | `alg/D-CODE-ICLR-2022` | https://github.com/vanderschaarlab/D-CODE-ICLR-2022
+Neural graphical modelling in continuous-time: consistency guarantees and algorithms | ICLR 2022 | `alg/Graphical-modelling-continuous-time` | https://github.com/alexisbellot/Graphical-modelling-continuous-time
+Label-Free Explainability for Unsupervised Models | ICML 2022 | `alg/Label-Free-XAI` | https://github.com/vanderschaarlab/Label-Free-XAI
+Inverse Contextual Bandits: Learning How Behavior Evolves over Time | ICML 2022 | `alg/invconban` | https://github.com/vanderschaarlab/invconban
+Data-SUITE: Data-centric identification of in-distribution incongruous examples | ICML 2022 | `alg/Data-SUITE` | https://github.com/seedatnabeel/Data-SUITE
+Continuous-Time Modeling of Counterfactual Outcomes Using Neural Controlled Differential Equations | ICML 2022 | `alg/TE-CDE` | https://github.com/seedatnabeel/TE-CDE

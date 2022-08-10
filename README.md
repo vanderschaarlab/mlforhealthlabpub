@@ -83,12 +83,14 @@ SyncTwin: Treatment Effect Estimation with Longitudinal Outcomes [[Link]](https:
 Conformal Time-series Forecasting [[Link]](https://proceedings.neurips.cc/paper/2021/hash/312f1ba2a72318edaaa995a67835fad5-Abstract.html) | NeurIPS 2021 | [alg/conformal-rnn](https://github.com/vanderschaarlab/conformal-rnn/tree/master)
 Estimating Multi-cause Treatment Effects via Single-cause Perturbation [[Link]](https://proceedings.neurips.cc/paper/2021/hash/c793b3be8f18731f2a4c627fb3c6c63d-Abstract.html) | NeurIPS 2021 | [alg/Single-Cause-Perturbation-NeurIPS-2021](https://github.com/vanderschaarlab/Single-Cause-Perturbation-NeurIPS-2021/)
 Invariant Causal Imitation Learning for Generalizable Policies [[Link]](https://papers.nips.cc/paper/2021/file/204904e461002b28511d5880e1c36a0f-Paper.pdf) | NeurIPS 2021 | [alg/Invariant-Causal-Imitation-Learning](https://github.com/vanderschaarlab/Invariant-Causal-Imitation-Learning/tree/main)
-Inferring Lexicographically-Ordered Rewards from Preferences | AAAI 2022 | [alg/lori](https://github.com/vanderschaarlab/lori)
-Inverse Online Learning: Understanding Non-Stationary and Reactionary Policies | ICLR 2022 | [alg/inverse-online](https://github.com/vanderschaarlab/inverse-online)
-D-CODE: Discovering Closed-form ODEs from Observed Trajectories | ICLR 2022 | [alg/D-CODE-ICLR-2022](https://github.com/vanderschaarlab/D-CODE-ICLR-2022)
-Neural graphical modelling in continuous-time: consistency guarantees and algorithms | ICLR 2022 | [alg/Graphical-modelling-continuous-time](https://github.com/vanderschaarlab/Graphical-modelling-continuous-time)
-Label-Free Explainability for Unsupervised Models | ICML 2022 | [alg/Label-Free-XAI](https://github.com/vanderschaarlab/Label-Free-XAI)
-Inverse Contextual Bandits: Learning How Behavior Evolves over Time | ICML 2022 | [alg/invconban](https://github.com/vanderschaarlab/invconban)
+Inferring Lexicographically-Ordered Rewards from Preferences [[Link]](https://ojs.aaai.org/index.php/AAAI/article/view/20516) | AAAI 2022 | [alg/lori](https://github.com/vanderschaarlab/lori)
+Inverse Online Learning: Understanding Non-Stationary and Reactionary Policies [[Link]](https://openreview.net/forum?id=DYypjaRdph2) | ICLR 2022 | [alg/inverse-online](https://github.com/vanderschaarlab/inverse-online)
+D-CODE: Discovering Closed-form ODEs from Observed Trajectories [[Link]](https://openreview.net/forum?id=wENMvIsxNN) | ICLR 2022 | [alg/D-CODE-ICLR-2022](https://github.com/vanderschaarlab/D-CODE-ICLR-2022)
+Neural graphical modelling in continuous-time: consistency guarantees and algorithms [[Link]](https://openreview.net/forum?id=SsHBkfeRF9L) | ICLR 2022 | [alg/Graphical-modelling-continuous-time](https://github.com/vanderschaarlab/Graphical-modelling-continuous-time)
+Label-Free Explainability for Unsupervised Models [[Link]](https://proceedings.mlr.press/v162/crabbe22a) | ICML 2022 | [alg/Label-Free-XAI](https://github.com/vanderschaarlab/Label-Free-XAI)
+Inverse Contextual Bandits: Learning How Behavior Evolves over Time [[Link]](https://proceedings.mlr.press/v162/huyuk22a.html) | ICML 2022 | [alg/invconban](https://github.com/vanderschaarlab/invconban)
+Data-SUITE: Data-centric identification of in-distribution incongruous examples [[Link]](https://proceedings.mlr.press/v162/seedat22a.html) | ICML 2022 | [alg/Data-SUITE](https://github.com/vanderschaarlab/Data-SUITE)
+Continuous-Time Modeling of Counterfactual Outcomes Using Neural Controlled Differential Equations [[Link]](https://proceedings.mlr.press/v162/seedat22b) | ICML 2022 | [alg/TE-CDE](https://github.com/vanderschaarlab/TE-CDE)
 
 <br/>
 

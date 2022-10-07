@@ -73,3 +73,6 @@
 [submodule "alg/TE-CDE"]
 	path = alg/TE-CDE
 	url = https://github.com/vanderschaarlab/TE-CDE
+[submodule "alg/CARs"]
+	path = alg/CARs
+	url = https://github.com/vanderschaarlab/CARs

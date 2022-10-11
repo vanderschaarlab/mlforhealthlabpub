@@ -1,0 +1,84 @@
+# ----------------------------------------------------------------------------------------------------------------------
+
+# Common
+# ------
+**/DATA-PRIVATE.md
+
+doc/presentation_software_mlaim.odp
+
+util/datasets.py
+
+public-exclude.txt
+
+pull_request_template.md
+
+REPOS.md
+
+
+# Project-specific
+# ----------------
+alg/ac_tpc/data/sample/data.npz
+
+alg/adsgan/data/Maggic.csv
+
+alg/asac/Main_Synthetic_Exp2.py
+
+alg/attentivess/Attentive_State_Space_Modeling_of_Cystic_Fibrosis_Trajectories.ipynb
+alg/attentivess/data/CF_data.p
+alg/attentivess/data/CF_dataset_processing.py
+alg/attentivess/data/feature_names.json
+alg/attentivess/initpath_alg.py
+alg/attentivess/paper/NeurIPS2019.pdf
+alg/attentivess/test_model_accuracy.py
+
+alg/dgp_survival/data/SEER_breast_cancer_cohort.csv
+alg/dgp_survival/data/make_data.py
+alg/dgp_survival/doc/README.md
+alg/dgp_survival/test_model.py
+
+alg/gain/GAIN_MNIST.py
+
+alg/gcit/ccle_experiments/data/
+
+alg/knockoffgan/Data_Generation_Main.py
+alg/knockoffgan/Data_Generation_X.py
+alg/knockoffgan/Data_Generation_Y.py
+alg/knockoffgan/Experiment_Main.R
+alg/knockoffgan/KnockoffGAN_Main.py
+alg/knockoffgan/plot_fdr_tpr.py
+alg/knockoffgan/test_acceptance.sh
+
+# NOTE: To be reviewed:
+# alg/pategan/Data_Loading.py
+# alg/pategan/pategan_main.py
+# alg/pategan/test_pategan.py
+
+alg/Lifelong Bayesian Optimization/
+
+alg/rnn-blockwise-jackknife/data/real_experiment_test
+alg/rnn-blockwise-jackknife/data/real_experiment_train
+
+alg/survivalquilts/sample data/metabric_cleaned_features_final.csv
+alg/survivalquilts/sample data/metabric_label.csv
+alg/survivalquilts/sample data/support_data.csv
+
+alg/symbolic_metamodeling/4-_Instance-wise_feature_importance.ipynb
+alg/symbolic_metamodeling/Predicting_prognosis_for_breast_cancer.ipynb
+alg/symbolic_metamodeling/data/PREDICT_data_subset.csv
+alg/symbolic_metamodeling/data/PREDICT_score.py
+alg/symbolic_metamodeling/doc/Metamodeling.pptx
+alg/symbolic_metamodeling/paper/NeurIPS2019_main.pdf
+alg/symbolic_metamodeling/pysymbolic/__init__.py
+alg/symbolic_metamodeling/pysymbolic/algorithms/__init__.py
+alg/symbolic_metamodeling/pysymbolic/algorithms/instancewise_feature_selection.py
+alg/symbolic_metamodeling/pysymbolic/algorithms/keras_predictive_models.py
+alg/symbolic_metamodeling/pysymbolic/benchmarks/__init__.py
+alg/symbolic_metamodeling/pysymbolic/models/__init__.py
+alg/symbolic_metamodeling/pysymbolic/utilities/__init__.py
+
+alg/Time Series Two Sample Test/
+
+alg/transductive_dropout/
+
+app/adjutorium/
+

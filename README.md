@@ -92,7 +92,7 @@ Inverse Contextual Bandits: Learning How Behavior Evolves over Time [[Link]](htt
 Data-SUITE: Data-centric identification of in-distribution incongruous examples [[Link]](https://proceedings.mlr.press/v162/seedat22a.html) | ICML 2022 | [alg/Data-SUITE](https://github.com/vanderschaarlab/Data-SUITE)
 Continuous-Time Modeling of Counterfactual Outcomes Using Neural Controlled Differential Equations [[Link]](https://proceedings.mlr.press/v162/seedat22b) | ICML 2022 | [alg/TE-CDE](https://github.com/vanderschaarlab/TE-CDE)
 Concept Activation Regions: A Generalized Framework For Concept-Based Explanations[[Link]](https://arxiv.org/abs/2209.11222) | NeurIPS 2022 | [alg/CARs](https://github.com/vanderschaarlab/CARs)
-Benchmarking Heterogeneous Treatment Effect Models through the Lens of Interpretability[[Link]](https://arxiv.org/abs/2206.08363) | NeurIPS 2022 | [alg/ITErpretability](https://github.com/vanderschaarlab/ITErpretability))
+Benchmarking Heterogeneous Treatment Effect Models through the Lens of Interpretability[[Link]](https://arxiv.org/abs/2206.08363) | NeurIPS 2022 | [alg/ITErpretability](https://github.com/vanderschaarlab/ITErpretability)
 <br/>
 
 Details of apps and other software is listed below:

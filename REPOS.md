@@ -72,3 +72,4 @@ Inverse Contextual Bandits: Learning How Behavior Evolves over Time | ICML 2022 
 Data-SUITE: Data-centric identification of in-distribution incongruous examples | ICML 2022 | `alg/Data-SUITE` | https://github.com/seedatnabeel/Data-SUITE
 Continuous-Time Modeling of Counterfactual Outcomes Using Neural Controlled Differential Equations | ICML 2022 | `alg/TE-CDE` | https://github.com/seedatnabeel/TE-CDE
 Concept Activation Regions: A Generalized Framework For Concept-Based Explanations | NeurIPS 2022 | `alg/CARs` | https://github.com/JonathanCrabbe/CARs
+Benchmarking Heterogeneous Treatment Effect Models through the Lens of Interpretability | NeurIPS 2022 | `alg/ITErpretability` | https://github.com/JonathanCrabbe/ITErpretability

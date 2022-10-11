@@ -76,3 +76,6 @@
 [submodule "alg/CARs"]
 	path = alg/CARs
 	url = https://github.com/vanderschaarlab/CARs
+[submodule "alg/ITErpretability"]
+	path = alg/ITErpretability
+	url = https://github.com/vanderschaarlab/ITErpretability.git

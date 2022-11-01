@@ -93,6 +93,8 @@ Data-SUITE: Data-centric identification of in-distribution incongruous examples 
 Continuous-Time Modeling of Counterfactual Outcomes Using Neural Controlled Differential Equations [[Link]](https://proceedings.mlr.press/v162/seedat22b) | ICML 2022 | [alg/TE-CDE](https://github.com/vanderschaarlab/TE-CDE)
 Concept Activation Regions: A Generalized Framework For Concept-Based Explanations[[Link]](https://arxiv.org/abs/2209.11222) | NeurIPS 2022 | [alg/CARs](https://github.com/vanderschaarlab/CARs)
 Benchmarking Heterogeneous Treatment Effect Models through the Lens of Interpretability[[Link]](https://arxiv.org/abs/2206.08363) | NeurIPS 2022 | [alg/ITErpretability](https://github.com/vanderschaarlab/ITErpretability)
+Composite Feature Selection using Deep Ensembles [[Link]](https://openreview.net/forum?id=-9PV7GKwYpM) | NeurIPS 2022 | [alg/Composite-Feature-Selection](https://github.com/vanderschaarlab/Composite-Feature-Selection)
+Data-IQ: Characterizing subgroups with heterogeneous outcomes in tabular data[[Link]](https://arxiv.org/abs/2210.13043) | NeurIPS 2022 | [alg/Data-IQ](https://github.com/vanderschaarlab/Data-IQ)
 <br/>
 
 Details of apps and other software is listed below:

@@ -79,3 +79,9 @@
 [submodule "alg/ITErpretability"]
 	path = alg/ITErpretability
 	url = https://github.com/vanderschaarlab/ITErpretability.git
+[submodule "alg/Data-IQ"]
+	path = alg/Data-IQ
+	url = https://github.com/vanderschaarlab/Data-IQ
+[submodule "alg/Composite-Feature-Selection"]
+	path = alg/Composite-Feature-Selection
+	url = https://github.com/vanderschaarlab/Composite-Feature-Selection

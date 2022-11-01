@@ -93,8 +93,8 @@ Data-SUITE: Data-centric identification of in-distribution incongruous examples 
 Continuous-Time Modeling of Counterfactual Outcomes Using Neural Controlled Differential Equations [[Link]](https://proceedings.mlr.press/v162/seedat22b) | ICML 2022 | [alg/TE-CDE](https://github.com/vanderschaarlab/TE-CDE)
 Concept Activation Regions: A Generalized Framework For Concept-Based Explanations[[Link]](https://arxiv.org/abs/2209.11222) | NeurIPS 2022 | [alg/CARs](https://github.com/vanderschaarlab/CARs)
 Benchmarking Heterogeneous Treatment Effect Models through the Lens of Interpretability[[Link]](https://arxiv.org/abs/2206.08363) | NeurIPS 2022 | [alg/ITErpretability](https://github.com/vanderschaarlab/ITErpretability)
-Composite Feature Selection using Deep Ensembles [[Link]](https://openreview.net/forum?id=-9PV7GKwYpM) | NeurIPS 2022 | [alg/Composite-Feature-Selection](https://github.com/vanderschaarlab/Composite-Feature-Selection)
-Data-IQ: Characterizing subgroups with heterogeneous outcomes in tabular data[[Link]](https://arxiv.org/abs/2210.13043) | NeurIPS 2022 | [alg/Data-IQ](https://github.com/vanderschaarlab/Data-IQ)
+Transfer Learning on Heterogeneous Feature Spaces for Treatment Effects Estimation[[Link]](https://arxiv.org/abs/2210.06183) | NeurIPS 2022 | [alg/HTCE-learners](https://github.com/vanderschaarlab/HTCE-learners)
+Synthetic Model Combination: An Instance-wise Approach to Unsupervised Ensemble Learning[[Link]](https://arxiv.org/abs/2210.05320) | NeurIPS 2022 | [alg/HTCE-learners](https://github.com/vanderschaarlab/synthetic-model-combination)
 <br/>
 
 Details of apps and other software is listed below:
@@ -102,7 +102,8 @@ Details of apps and other software is listed below:
 App/Software [[Link]](#) | Description | Publication | Code
 --- | --- | --- | ---
 Adjutorium COVID-19 [[Link]](https://www.vanderschaar-lab.com/paper-on-covid-19-hospital-capacity-planning-published-in-machine-learning/) | Adjutorium COVID-19: an AI-powered tool that accurately predicts how COVID-19 will impact resource needs (ventilators, ICU beds, etc.) at the individual patient level and the hospital level | - | [app/adjutorium-covid19-public](app/adjutorium-covid19-public)
-Clairvoyance [[Link]](https://www.vanderschaar-lab.com/clairvoyance-alpha-the-first-unified-end-to-end-automl-pipeline-for-time-series-data/) | Clairvoyance: A Pipeline Toolkit for Medical Time Series | - | [clairvoyance repository](https://github.com/vanderschaarlab/clairvoyance)
+Clairvoyance [[Link]](https://www.vanderschaar-lab.com/clairvoyance-alpha-the-first-unified-end-to-end-automl-pipeline-for-time-series-data/) | Clairvoyance: A Pipeline Toolkit for Medical Time Series | [ICML 2021](https://openreview.net/forum?id=xnC8YwKUE3k) | [clairvoyance repository](https://github.com/vanderschaarlab/clairvoyance)
+Clairvoyance2 [[Link]](https://github.com/vanderschaarlab/clairvoyance2) | `clairvoyance2`: a Unified Toolkit for Medical Time Series | - | [clairvoyance2 repository](https://github.com/vanderschaarlab/clairvoyance2)
 Hide-and-Seek Privacy Challenge [[Link]](http://www.vanderschaar-lab.com/privacy-challenge/) | Hide-and-Seek Privacy Challenge: Synthetic Data Generation vs. Patient Re-identification with Clinical Time-series Data | [NeurIPS 2020 competition track](https://arxiv.org/abs/2007.12087) | [app/hide-and-seek](app/hide-and-seek)
 
 ## Citations
@@ -110,20 +111,10 @@ Please cite the *the applicable papers* and [van der Schaar Lab repository](http
 
 ## Breakdown by category
 
-**Synthetic data**
-
-* [alg/pategan](alg/pategan)
-* [alg/adsgan](alg/adsgan)
-* [alg/dpbag](alg/dpbag)
-* [alg/timegan](alg/timegan)
-* [alg/Fourier-flows](https://github.com/vanderschaarlab/Fourier-flows/)
-
-**More categories to come**
-
-* 🚧
+**See breakdown [here](https://github.com/vanderschaarlab/.github/tree/main/profile).**
 
 ## License
-Copyright **2019-2021** van der Schaar Lab.
+Copyright **2019-2022** van der Schaar Lab.
 
 This software is released under the [3-Clause BSD license](https://opensource.org/licenses/BSD-3-Clause) unless mentioned otherwise by the respective algorithms and apps.
 

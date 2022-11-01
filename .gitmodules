@@ -85,3 +85,6 @@
 [submodule "alg/HTCE-learners"]
 	path = alg/HTCE-learners
 	url = https://github.com/vanderschaarlab/HTCE-learners
+[submodule "alg/synthetic-model-combination"]
+	path = alg/synthetic-model-combination
+	url = https://github.com/vanderschaarlab/synthetic-model-combination

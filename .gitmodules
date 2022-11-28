@@ -82,6 +82,9 @@
 [submodule "alg/Composite-Feature-Selection"]
 	path = alg/Composite-Feature-Selection
 	url = https://github.com/vanderschaarlab/Composite-Feature-Selection
+[submodule "alg/ITErpretability.git"]
+	path = alg/ITErpretability.git
+	url = https://github.com/vanderschaarlab/ITErpretability.git
 [submodule "alg/HTCE-learners"]
 	path = alg/HTCE-learners
 	url = https://github.com/vanderschaarlab/HTCE-learners

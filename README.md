@@ -1,8 +1,10 @@
 # van der Schaar Lab
-This repository contains the implementations of algorithms developed
-by the [van der Schaar Lab](https://www.vanderschaar-lab.com/).
+__Note__ : For the most recent papers and code, checkout https://github.com/vanderschaarlab.
 
-Please send comments and suggestions to [nm736@cam.ac.uk](mailto:nm736@cam.ac.uk)
+__Legacy code__ : This repository contains the implementations of algorithms developed
+by the [van der Schaar Lab](https://www.vanderschaar-lab.com/) for papers before 2023.
+
+
 
 ## Content
 An overview of the content of this repository is as below:
